@@ -11,3 +11,6 @@
 
 #!.yarn/cache
 .pnp.*
+
+# vitest write files here
+node_modules

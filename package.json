@@ -1,14 +1,17 @@
 {
   "name": "relempago_marquinhos",
   "main": "src/main.ts",
+  "type": "module",
   "scripts": {
-    "start": "node src/main.ts"
+    "start": "node src/main.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "vitest": "^3.0.8"
   },
   "prettier": {
     "arrowParens": "avoid",
