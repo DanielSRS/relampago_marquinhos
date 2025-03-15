@@ -1,1 +1,1 @@
-console.log("Project created!!");
+console.log('Project created!!');
