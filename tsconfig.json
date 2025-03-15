@@ -1,0 +1,58 @@
+{
+  "compilerOptions": {
+    // Type checking
+    "allowUnreachableCode":false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes":true,
+    "noFallthroughCasesInSwitch":true,
+    "noImplicitAny":true,
+    "noImplicitOverride":true,
+    "noImplicitReturns":true,
+    "noImplicitThis":true,
+    "noPropertyAccessFromIndexSignature":true,
+    "noUncheckedIndexedAccess":true,
+    "noUnusedLocals":true,
+    "noUnusedParameters":true,
+    "strict": true,
+    "strictBindCallApply":true,
+    "strictBuiltinIteratorReturn":true,
+    "strictFunctionTypes":true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization":true,
+    "useUnknownInCatchVariables":true,
+
+    // module
+    "allowArbitraryExtensions":false,
+    "allowImportingTsExtensions":true,
+    // allowUmdGlobalAccess ???
+    "module": "nodenext", // maybe preserve???
+    "moduleResolution": "node16", // ts base recomendation
+    "noUncheckedSideEffectImports":true,
+    // resolveJsonModule ???
+    // resolvePackageJsonExports true by default ??
+
+    "types": [],
+
+    // emit
+    "declaration":false,
+    "noEmit":true,
+    "noEmitHelpers":true,
+
+    // js support
+    "allowJs":false,
+
+    // 
+    "allowSyntheticDefaultImports":false,
+    "erasableSyntaxOnly":true,
+    "forceConsistentCasingInFileNames":true,
+    "verbatimModuleSyntax":true,
+
+    "lib": ["es2024"], // ts base recomendation
+    "target": "es2024", // ts base recomendation
+
+    "esModuleInterop": true, // ts base recomendation
+    "skipLibCheck": true // ts base recomendation
+  },
+  "include": ["src/**/*"]
+}
