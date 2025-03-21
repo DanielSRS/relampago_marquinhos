@@ -1,4 +1,4 @@
-import { it, expect } from 'vitest';
+import { it, expect, test } from 'vitest';
 import { calcRecomendations } from './main.ts';
 import { Car, Station } from './main.types.ts';
 
@@ -20,6 +20,14 @@ it('can run tests', () => {
 it('returns a list', () => {
   const res = calcRecomendations(stations, car);
   expect(Array.isArray(res)).toBe(true);
+});
+
+test('if recommendations list always contains all Station set', () => {
+  const res = calcRecomendations(stations, car);
+  const compareFn = (a: Station, b: Station): number => {
+    return b.id - a.id;
+  };
+  expect(res.toSorted(compareFn)).toEqual(stations.toSorted(compareFn));
 });
 
 it('returns recomendations by position', () => {
