@@ -13,6 +13,12 @@ const stations: Array<Station> = [
   Station(2, 50, 100, 'avaliable'),
 ];
 
+const stations2: Array<Station> = [
+  Station(1, 10, 20, 'reserved'),
+  Station(0, 100, 200, 'avaliable'),
+  Station(2, 50, 100, 'charging-car'),
+];
+
 it('can run tests', () => {
   expect(true).toBe(true);
 });
@@ -28,6 +34,13 @@ test('if recommendations list always contains all Station set', () => {
     return b.id - a.id;
   };
   expect(res.toSorted(compareFn)).toEqual(stations.toSorted(compareFn));
+});
+
+test('if the recommended list is sorted from less crowded to the most one', () => {
+  const res = calcRecomendations(stations2, car);
+  expect(res[0]).toBe(stations2[1]);
+  expect(res[1]).toBe(stations2[0]);
+  expect(res[2]).toBe(stations2[2]);
 });
 
 it('returns recomendations by position', () => {
