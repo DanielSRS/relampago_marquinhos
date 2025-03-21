@@ -8,9 +8,9 @@ const car: Car = Car(0, 5, 4);
  * Estações de recarga
  */
 const stations: Array<Station> = [
-  Station(0, 100, 200),
-  Station(1, 10, 20),
-  Station(2, 50, 100),
+  Station(0, 100, 200, 'avaliable'),
+  Station(1, 10, 20, 'avaliable'),
+  Station(2, 50, 100, 'avaliable'),
 ];
 
 it('can run tests', () => {

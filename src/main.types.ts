@@ -8,14 +8,23 @@ export interface Position {
   y: number;
 }
 
+export type StationState = 'avaliable' | 'charging-car' | 'reserved';
+
 export interface Station {
   id: number;
+  state: StationState;
   location: Position;
 }
 
-export function Station(id: number, x: number, y: number): Car {
+export function Station(
+  id: number,
+  x: number,
+  y: number,
+  state: StationState,
+): Station {
   return {
     id,
+    state,
     location: {
       x,
       y,
