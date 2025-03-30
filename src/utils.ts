@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { consoleTransport, logger } from 'react-native-logs';
+
 // https://medium.com/@patrick.trasborg/creating-a-type-safe-curry-function-with-typescript-3eeb29b5457d
 type Fn = (...args: any[]) => any;
 
@@ -61,3 +64,14 @@ export type UInt32 = number & { ' brand': 'UInt32' };
 export const toUInt32 = (number: number): UInt32 => {
   return (number >>> 0) as UInt32;
 };
+
+export const Logger = logger.createLogger({
+  transport: consoleTransport,
+  transportOptions: {
+    colors: {
+      info: 'blueBright',
+      warn: 'yellowBright',
+      error: 'redBright',
+    },
+  },
+});

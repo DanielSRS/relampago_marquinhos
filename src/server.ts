@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { StationGroup } from './main.types.ts';
-import { curry } from './utils.ts';
+import { curry, Logger } from './utils.ts';
 
 import * as net from 'node:net';
 
@@ -60,11 +60,9 @@ export const connectionSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+const log = Logger.extend('Server');
 const server = net.createServer(socket => {
-  console.log(
-    'Client connected:',
-    socket.remoteAddress + ':' + socket.remotePort,
-  );
+  log.info('Client connected:', socket.remoteAddress + ':' + socket.remotePort);
 
   socket.on('data', d => {
     // verifica se os dados estão no formato esperado
@@ -97,7 +95,7 @@ const server = net.createServer(socket => {
       );
       return;
     }
-    console.log(`Received: ${data}`);
+    log.info(`Received: ${data}`);
 
     const response = `Server received: ${data}`;
     socket.write(
@@ -107,22 +105,22 @@ const server = net.createServer(socket => {
         data: response,
       } satisfies Response<string>),
     );
-    console.log(`Sent: ${response}`);
+    log.info(`Sent: ${response}`);
   });
 
   socket.on('end', () => {
-    console.log('Client disconnected');
+    log.debug('Client disconnected');
   });
 
   socket.on('error', err => {
-    console.error(`Socket error: ${err.message}`);
+    log.error(`Socket error: ${err.message}`);
   });
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`Server listening on ${HOST}:${PORT}`);
+  log.info(`Server listening on ${HOST}:${PORT}`);
 });
 
 server.on('error', err => {
-  console.error(`Server error: ${err.message}`);
+  log.error(`Server error: ${err.message}`);
 });

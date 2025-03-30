@@ -15,4 +15,9 @@ export default defineConfig([
     extends: ['js/recommended'],
   },
   tseslint.configs.recommended,
+  {
+    rules: {
+      'no-console': 'error',
+    },
+  },
 ]);

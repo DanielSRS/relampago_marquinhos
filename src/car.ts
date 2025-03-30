@@ -1,13 +1,15 @@
 import * as net from 'node:net';
 import type { Request } from './server.js';
+import { Logger } from './utils.ts';
 
 const HOST = 'localhost'; //server IP
 const PORT = 8080; // server port
 
 const client = new net.Socket();
 
+const log = Logger.extend('Car');
 client.connect(PORT, HOST, () => {
-  console.log(`Connected to server at ${HOST}:${PORT}`);
+  log.info(`Connected to server at ${HOST}:${PORT}`);
 
   const message: Request = {
     type: 'reserve',
@@ -17,18 +19,18 @@ client.connect(PORT, HOST, () => {
     },
   };
   client.write(JSON.stringify(message));
-  console.log(`Sent: ${message}`);
+  log.info(`Sent: `, message);
 });
 
 client.on('data', data => {
-  console.log(`Received: ${data}`);
+  log.info(`Received: `, JSON.parse(data.toString()));
   client.end();
 });
 
 client.on('close', () => {
-  console.log('Connection closed');
+  log.info('Connection closed');
 });
 
 client.on('error', err => {
-  console.error(`Error: ${err.message}`);
+  log.error(`Error: `, err);
 });
