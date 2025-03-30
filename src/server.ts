@@ -8,12 +8,22 @@ const HOST = 'localhost';
 const PORT = 8080;
 
 const addReservation = curry(
-  (stations: StationGroup, idStation: number, idUser: number): string => {
+  (
+    stations: StationGroup,
+    idStation: number,
+    idUser: number,
+  ): {
+    success: boolean;
+    message: string;
+  } => {
     const station = stations[idStation];
 
     if (!station) {
       // retutn error
-      return 'station does not exist';
+      return {
+        success: false,
+        message: 'station does not exist',
+      };
     }
 
     // verificar se ja tem reserva
@@ -24,7 +34,10 @@ const addReservation = curry(
       station.reservations.push(idUser);
     }
     // retorna sucesso
-    return 'rervated';
+    return {
+      success: true,
+      message: `Reserved station ${station.id}`,
+    };
   },
 );
 
@@ -37,6 +50,7 @@ const STATIONS: StationGroup = {
     },
     reservations: [],
     state: 'avaliable',
+    suggestions: [],
   },
 };
 
@@ -72,15 +86,16 @@ const server = net.createServer(socket => {
     }
 
     if (data.data.type === 'reserve') {
+      const result = addReservation(
+        STATIONS,
+        data.data.data.stationId,
+        data.data.data.userId,
+      );
       socket.write(
         JSON.stringify({
-          message: '',
-          success: true,
-          data: addReservation(
-            STATIONS,
-            data.data.data.stationId,
-            data.data.data.userId,
-          ),
+          message: result.message,
+          success: result.success,
+          data: undefined,
         } satisfies Response<unknown>),
       );
       return;
