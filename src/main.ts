@@ -30,8 +30,8 @@ export const calcRecomendations = curry(
       }
 
       // Prioriza postos com menos reservas
-      if (a.reservations.length !== a.reservations.length) {
-        return b.reservations.length - a.reservations.length;
+      if (a.reservations.length !== b.reservations.length) {
+        return a.reservations.length - b.reservations.length;
       }
 
       const distanceAC = calculateDistance(car.location, a.location);
