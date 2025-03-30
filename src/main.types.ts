@@ -38,6 +38,14 @@ export function Station(
   };
 }
 
+export type RequestMap = {
+  reserve: {
+    userId: number;
+    stationId: number;
+  };
+  getSuggestions: Car;
+};
+
 export type Request =
   | {
       type: 'reserve';
