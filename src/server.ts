@@ -66,7 +66,7 @@ const server = net.createServer(socket => {
 
   socket.on('data', d => {
     // verifica se os dados estão no formato esperado
-    const data = connectionSchema.safeParse(d);
+    const data = connectionSchema.safeParse(JSON.parse(d.toString()));
 
     if (!data.success) {
       // return error
@@ -75,7 +75,7 @@ const server = net.createServer(socket => {
         JSON.stringify({
           message: 'erro',
           success: false,
-          error: 'invalid data format',
+          error: JSON.stringify(data.error, null, 2),
         } satisfies ErrorResponse<unknown>),
       );
       return;
