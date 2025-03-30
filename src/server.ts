@@ -1,16 +1,10 @@
 import { z } from 'zod';
-import type {
-  ErrorResponse,
-  StationGroup,
-  Response,
-  Car,
-} from './main.types.ts';
+import type { ErrorResponse, StationGroup, Response } from './main.types.ts';
 import { curry, Logger } from './utils.ts';
 
 import * as net from 'node:net';
-import { calcRecomendations } from './main.ts';
-import { filterStationsByDistanceRadius } from './location.ts';
 import { createRouter } from './server/router.ts';
+import { getSuggestions } from './server/routes/stationSuggetions.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -145,14 +139,7 @@ const server = net.createServer(socket => {
           data: undefined,
         } satisfies Response<unknown>;
       })
-      .add('getSuggestions', (data: Car) => {
-        const res = generateSuggestions(MAX_RADIUS, STATIONS, data);
-        return {
-          message: 'Lista de recomendações',
-          success: true,
-          data: res,
-        } satisfies Response<unknown>;
-      });
+      .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 
@@ -176,39 +163,3 @@ server.listen(PORT, HOST, () => {
 server.on('error', err => {
   log.error(`Server error: ${err.message}`);
 });
-
-function generateSuggestions(
-  maxRadius: number,
-  stations: StationGroup,
-  car: Car,
-) {
-  const stationList = Object.values(stations);
-  // Verificar se o carro já recebeu alguma sugestão
-  const stationWithSuggestion = stationList.find(station =>
-    station.suggestions.includes(car.id),
-  );
-
-  // Remove sugestão se houver
-  if (stationWithSuggestion) {
-    const carIndex = stationWithSuggestion.suggestions.findIndex(
-      id => id === car.id,
-    );
-    if (carIndex !== -1) {
-      stationWithSuggestion.suggestions.splice(carIndex, 1);
-    }
-  }
-
-  // Limita as recomendações a um determinado raio de distância do veículo
-  const filteredStations = filterStationsByDistanceRadius(
-    maxRadius,
-    stationList,
-    car,
-  );
-
-  // calcula recomendações
-  const recommendations = calcRecomendations(filteredStations, car);
-
-  // Registra sugestão feita
-  recommendations[0]?.suggestions.push(car.id);
-  return recommendations;
-}
