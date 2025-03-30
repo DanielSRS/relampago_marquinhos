@@ -3,6 +3,7 @@ import type { ErrorResponse, StationGroup, Response } from './main.types.ts';
 import { curry, Logger } from './utils.ts';
 
 import * as net from 'node:net';
+import { createRouter } from './server/router.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -101,32 +102,21 @@ const server = net.createServer(socket => {
       return;
     }
 
-    if (data.data.type === 'reserve') {
-      const result = addReservation(
-        STATIONS,
-        data.data.data.stationId,
-        data.data.data.userId,
-      );
-      socket.write(
-        JSON.stringify({
-          message: result.message,
-          success: result.success,
-          data: undefined,
-        } satisfies Response<unknown>),
-      );
-      return;
-    }
-    log.info(`Received: ${data}`);
+    const router = createRouter().add('reserve', data => {
+      // Remover carro da lista de sugestões
 
-    const response = `Server received: ${data}`;
-    socket.write(
-      JSON.stringify({
-        message: 'sucesso',
-        success: true,
-        data: response,
-      } satisfies Response<string>),
-    );
-    log.info(`Sent: ${response}`);
+      const result = addReservation(STATIONS, data.stationId, data.userId);
+      return {
+        message: result.message,
+        success: result.success,
+        data: undefined,
+      } satisfies Response<unknown>;
+    });
+
+    const response = router.all()[data.data.type]?.(data.data.data);
+
+    // log.info(`Received: ${data}`);
+    socket.write(JSON.stringify(response));
   });
 
   socket.on('end', () => {
