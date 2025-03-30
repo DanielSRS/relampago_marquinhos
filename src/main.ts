@@ -28,6 +28,12 @@ export const calcRecomendations = curry(
           return -1; // Manda para o fim da lista
         }
       }
+
+      // Prioriza postos com menos reservas
+      if (a.reservations.length !== a.reservations.length) {
+        return b.reservations.length - a.reservations.length;
+      }
+
       const distanceAC = calculateDistance(car.location, a.location);
       const distanceBC = calculateDistance(car.location, b.location);
 
