@@ -1,13 +1,11 @@
 import { z } from 'zod';
-import type { StationGroup } from './main.types.ts';
+import type { ErrorResponse, StationGroup, Response } from './main.types.ts';
 import { curry, Logger } from './utils.ts';
 
 import * as net from 'node:net';
 
 const HOST = 'localhost';
 const PORT = 8080;
-
-const STATIONS: StationGroup = {};
 
 const addReservation = curry(
   (stations: StationGroup, idStation: number, idUser: number): string => {
@@ -30,24 +28,16 @@ const addReservation = curry(
   },
 );
 
-export type Request = {
-  type: 'reserve';
-  data: {
-    userId: number;
-    stationId: number;
-  };
-};
-
-export type Response<T> = {
-  message: string;
-  success: boolean;
-  data: T;
-};
-
-export type ErrorResponse<T> = {
-  message: string;
-  success: boolean;
-  error: T;
+const STATIONS: StationGroup = {
+  12: {
+    id: 12,
+    location: {
+      x: 0,
+      y: 1,
+    },
+    reservations: [],
+    state: 'avaliable',
+  },
 };
 
 export const connectionSchema = z.discriminatedUnion('type', [

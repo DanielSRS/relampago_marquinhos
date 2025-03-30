@@ -1,5 +1,5 @@
 import * as net from 'node:net';
-import type { Request } from './server.js';
+import type { Request } from './main.types.ts';
 import { Logger } from './utils.ts';
 
 const HOST = 'localhost'; //server IP

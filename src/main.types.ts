@@ -36,6 +36,26 @@ export function Station(
   };
 }
 
+export type Request = {
+  type: 'reserve';
+  data: {
+    userId: number;
+    stationId: number;
+  };
+};
+
+export type Response<T> = {
+  message: string;
+  success: boolean;
+  data: T;
+};
+
+export type ErrorResponse<T> = {
+  message: string;
+  success: boolean;
+  error: T;
+};
+
 export type Reservations = Record<number, number[]>;
 
 export function Car(id: number, x: number, y: number): Car {
