@@ -19,7 +19,7 @@ const addReservation = curry(
     }
 
     // verificar se ja tem reserva
-    var hasReservation = station.reservations.includes(idUser);
+    const hasReservation = station.reservations.includes(idUser);
 
     if (!hasReservation) {
       // faz a reseva
