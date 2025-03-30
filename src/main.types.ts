@@ -14,7 +14,10 @@ export interface Station {
   id: number;
   state: StationState;
   location: Position;
+  reservations: number[];
 }
+
+export type StationGroup = Record<number, Station>;
 
 export function Station(
   id: number,
@@ -29,8 +32,11 @@ export function Station(
       x,
       y,
     },
+    reservations: [],
   };
 }
+
+export type Reservations = Record<number, number[]>;
 
 export function Car(id: number, x: number, y: number): Car {
   return {

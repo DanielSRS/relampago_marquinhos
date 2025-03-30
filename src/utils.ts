@@ -1,3 +1,4 @@
+// https://medium.com/@patrick.trasborg/creating-a-type-safe-curry-function-with-typescript-3eeb29b5457d
 type Fn = (...args: any[]) => any;
 
 type RequiredFirstParam<Func extends Fn> =
@@ -49,4 +50,13 @@ export const curry = <Func extends Fn>(
   };
 
   return curriedFunc;
+};
+
+export type UInt32 = number & { ' brand': 'UInt32' };
+
+/**
+ * Converts a number to a UInt32 value
+ */
+export const toUInt32 = (number: number): UInt32 => {
+  return (number >>> 0) as UInt32;
 };
