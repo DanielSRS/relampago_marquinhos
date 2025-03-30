@@ -12,10 +12,13 @@ client.connect(PORT, HOST, () => {
   log.info(`Connected to server at ${HOST}:${PORT}`);
 
   const message: Request = {
-    type: 'reserve',
+    type: 'getSuggestions',
     data: {
-      stationId: 12,
-      userId: 456,
+      id: 45,
+      location: {
+        x: 23,
+        y: 68,
+      },
     },
   };
   client.write(JSON.stringify(message));

@@ -38,13 +38,18 @@ export function Station(
   };
 }
 
-export type Request = {
-  type: 'reserve';
-  data: {
-    userId: number;
-    stationId: number;
-  };
-};
+export type Request =
+  | {
+      type: 'reserve';
+      data: {
+        userId: number;
+        stationId: number;
+      };
+    }
+  | {
+      type: 'getSuggestions';
+      data: Car;
+    };
 
 export type Response<T> = {
   message: string;

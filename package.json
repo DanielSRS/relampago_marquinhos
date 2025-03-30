@@ -7,7 +7,7 @@
     "test": "vitest",
     "lint": "eslint .",
     "runcar": "node src/car.ts",
-    "runserver": "node src/server.ts"
+    "runserver": "node --watch src/server.ts"
   },
   "dependencies": {
     "@types/node": "^22.13.14",
