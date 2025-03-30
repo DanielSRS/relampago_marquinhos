@@ -15,6 +15,7 @@ export interface Station {
   state: StationState;
   location: Position;
   reservations: number[];
+  suggestions: number[];
 }
 
 export type StationGroup = Record<number, Station>;
@@ -33,6 +34,7 @@ export function Station(
       y,
     },
     reservations: [],
+    suggestions: [],
   };
 }
 

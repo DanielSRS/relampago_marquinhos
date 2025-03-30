@@ -25,6 +25,12 @@ const stations3: Array<Station> = [
   Station(2, 50, 100, 'charging-car'),
 ];
 
+const stations4: Array<Station> = [
+  Station(0, 10, 20, 'reserved'),
+  Station(1, 10, 20, 'reserved'),
+  Station(2, 10, 20, 'reserved'),
+];
+
 it('can run tests', () => {
   expect(true).toBe(true);
 });
@@ -67,4 +73,16 @@ it('recomendations check reservations', () => {
   expect(res[0]).toBe(stations3[1]);
   expect(res[1]).toBe(stations3[0]);
   expect(res[2]).toBe(stations3[2]);
+});
+
+it('recomendations check suggestions', () => {
+  stations4[0]?.suggestions.push(...[1, 2, 4, 5]);
+  stations4[1]?.suggestions.push(...[22, 343, 5442, 23, 1212, 88]);
+  stations4[2]?.suggestions.push(...[77]);
+
+  const res = calcRecomendations(stations4, car);
+
+  expect(res[0]).toBe(stations4[2]);
+  expect(res[1]).toBe(stations4[0]);
+  expect(res[2]).toBe(stations4[1]);
 });

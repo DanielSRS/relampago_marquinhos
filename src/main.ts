@@ -36,8 +36,12 @@ export const calcRecomendations = curry(
 
       const distanceAC = calculateDistance(car.location, a.location);
       const distanceBC = calculateDistance(car.location, b.location);
+      if (distanceAC !== distanceBC) {
+        return distanceAC - distanceBC;
+      }
 
-      return distanceAC - distanceBC; // Subtração para obter um valor numérico
+      // Prioriza postos com menos sugestões
+      return a.suggestions.length - b.suggestions.length;
     });
   },
 );
