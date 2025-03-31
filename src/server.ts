@@ -4,6 +4,7 @@ import type {
   StationGroup,
   Response,
   UserGroup,
+  ChargeRecord,
 } from './main.types.ts';
 import { curry, Logger } from './utils.ts';
 
@@ -15,6 +16,7 @@ import { carSchema } from './schemas/carSchema.ts';
 import { stationSchema } from './schemas/stationSchema.ts';
 import { registerUser } from './server/routes/registerCar.ts';
 import { userSchema } from './schemas/userSchema.ts';
+import { startChaging } from './server/routes/startCharging.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -95,6 +97,8 @@ const STATIONS: StationGroup = {
 
 const USERS: UserGroup = {};
 
+const CHARGES: ChargeRecord = {};
+
 export const connectionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('reserve'),
@@ -114,6 +118,13 @@ export const connectionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('registerUser'),
     data: userSchema,
+  }),
+  z.object({
+    type: z.literal('startChaging'),
+    data: z.object({
+      stationId: z.number(),
+      userId: z.number(),
+    }),
   }),
 ]);
 
@@ -151,7 +162,8 @@ const server = net.createServer(socket => {
       })
       .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
       .add('registerStation', registerStation(STATIONS))
-      .add('registerUser', registerUser(USERS));
+      .add('registerUser', registerUser(USERS))
+      .add('startChaging', startChaging(STATIONS, USERS, CHARGES));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 
@@ -175,3 +187,17 @@ server.listen(PORT, HOST, () => {
 server.on('error', err => {
   log.error(`Server error: ${err.message}`);
 });
+
+// ------
+
+// Finalizar recarga
+// Se o posto exite
+// Se o cliente exite
+// O posto deve estar recarregando um carro
+// O id do carro deve ser o mesmo do Charge
+
+// Muda o status da estção
+//   - para disponível se não houver mais reservas
+//   - para reservado se ainda houver reservas na fila
+// Finalizar o Charge (salvar end time)
+// retornar o Charge para o usuário

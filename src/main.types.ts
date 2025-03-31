@@ -10,17 +10,38 @@ export interface Position {
 
 export type StationState = 'avaliable' | 'charging-car' | 'reserved';
 
-export interface Station {
+export type Charge = {
+  chargeId: number;
+  userId: number;
+  stationId: number;
+  startTime: Date;
+  endTime: Date;
+  cost: number;
+};
+
+export type Station = {
   id: number;
-  state: StationState;
   location: Position;
   reservations: number[];
   suggestions: number[];
-}
+} & (
+  | {
+      state: 'charging-car';
+      // Id de uma recarga
+      onUse: number;
+    }
+  | {
+      state: 'avaliable';
+    }
+  | {
+      state: 'reserved';
+    }
+);
 
 export type User = Omit<Car, 'location'>;
 
 export type StationGroup = Record<number, Station>;
+export type ChargeRecord = Record<number, Charge>;
 export type UserGroup = Record<number, User>;
 
 export function Station(
@@ -32,6 +53,8 @@ export function Station(
   return {
     id,
     state,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onUse: undefined as any,
     location: {
       x,
       y,
@@ -49,6 +72,10 @@ export type RequestMap = {
   getSuggestions: Car;
   registerStation: Station;
   registerUser: User;
+  startChaging: {
+    stationId: number;
+    userId: number;
+  };
 };
 
 export type Request =
@@ -70,6 +97,13 @@ export type Request =
   | {
       type: 'registerUser';
       data: User;
+    }
+  | {
+      type: 'startChaging';
+      data: {
+        stationId: number;
+        userId: number;
+      };
     };
 
 export type Response<T> = {
