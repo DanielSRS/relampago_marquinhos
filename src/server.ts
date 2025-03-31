@@ -5,6 +5,7 @@ import { curry, Logger } from './utils.ts';
 import * as net from 'node:net';
 import { createRouter } from './server/router.ts';
 import { getSuggestions } from './server/routes/stationSuggetions.ts';
+import { carSchema } from './schemas/carSchema.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -82,16 +83,6 @@ const STATIONS: StationGroup = {
     suggestions: [],
   },
 };
-
-const locatioonSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-});
-
-const carSchema = z.object({
-  id: z.number(),
-  location: locatioonSchema,
-});
 
 export const connectionSchema = z.discriminatedUnion('type', [
   z.object({
