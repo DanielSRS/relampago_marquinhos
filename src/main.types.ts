@@ -44,6 +44,7 @@ export type RequestMap = {
     stationId: number;
   };
   getSuggestions: Car;
+  registerStation: Station;
 };
 
 export type Request =
@@ -57,6 +58,10 @@ export type Request =
   | {
       type: 'getSuggestions';
       data: Car;
+    }
+  | {
+      type: 'registerStation';
+      data: Station;
     };
 
 export type Response<T> = {

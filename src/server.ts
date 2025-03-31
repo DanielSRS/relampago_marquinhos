@@ -5,7 +5,9 @@ import { curry, Logger } from './utils.ts';
 import * as net from 'node:net';
 import { createRouter } from './server/router.ts';
 import { getSuggestions } from './server/routes/stationSuggetions.ts';
+import { registerStation } from './server/routes/registerStation.ts';
 import { carSchema } from './schemas/carSchema.ts';
+import { stationSchema } from './schemas/stationSchema.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -96,6 +98,10 @@ export const connectionSchema = z.discriminatedUnion('type', [
     type: z.literal('getSuggestions'),
     data: carSchema,
   }),
+  z.object({
+    type: z.literal('registerStation'),
+    data: stationSchema,
+  }),
 ]);
 
 const log = Logger.extend('Server');
@@ -130,7 +136,8 @@ const server = net.createServer(socket => {
           data: undefined,
         } satisfies Response<unknown>;
       })
-      .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS));
+      .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
+      .add('registerStation', registerStation(STATIONS));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 

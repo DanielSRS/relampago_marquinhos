@@ -12,8 +12,11 @@ client.connect(PORT, HOST, () => {
   log.info(`Connected to server at ${HOST}:${PORT}`);
 
   const message: Request = {
-    type: 'getSuggestions',
+    type: 'registerStation',
     data: {
+      reservations: [],
+      state: 'avaliable',
+      suggestions: [],
       id: 45,
       location: {
         x: 23,
