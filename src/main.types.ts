@@ -18,7 +18,10 @@ export interface Station {
   suggestions: number[];
 }
 
+export type User = Omit<Car, 'location'>;
+
 export type StationGroup = Record<number, Station>;
+export type UserGroup = Record<number, User>;
 
 export function Station(
   id: number,
@@ -45,6 +48,7 @@ export type RequestMap = {
   };
   getSuggestions: Car;
   registerStation: Station;
+  registerUser: User;
 };
 
 export type Request =
@@ -62,6 +66,10 @@ export type Request =
   | {
       type: 'registerStation';
       data: Station;
+    }
+  | {
+      type: 'registerUser';
+      data: User;
     };
 
 export type Response<T> = {

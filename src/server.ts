@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import type { ErrorResponse, StationGroup, Response } from './main.types.ts';
+import type {
+  ErrorResponse,
+  StationGroup,
+  Response,
+  UserGroup,
+} from './main.types.ts';
 import { curry, Logger } from './utils.ts';
 
 import * as net from 'node:net';
@@ -8,6 +13,8 @@ import { getSuggestions } from './server/routes/stationSuggetions.ts';
 import { registerStation } from './server/routes/registerStation.ts';
 import { carSchema } from './schemas/carSchema.ts';
 import { stationSchema } from './schemas/stationSchema.ts';
+import { registerUser } from './server/routes/registerCar.ts';
+import { userSchema } from './schemas/userSchema.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -86,6 +93,8 @@ const STATIONS: StationGroup = {
   },
 };
 
+const USERS: UserGroup = {};
+
 export const connectionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('reserve'),
@@ -101,6 +110,10 @@ export const connectionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('registerStation'),
     data: stationSchema,
+  }),
+  z.object({
+    type: z.literal('registerUser'),
+    data: userSchema,
   }),
 ]);
 
@@ -137,7 +150,8 @@ const server = net.createServer(socket => {
         } satisfies Response<unknown>;
       })
       .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
-      .add('registerStation', registerStation(STATIONS));
+      .add('registerStation', registerStation(STATIONS))
+      .add('registerUser', registerUser(USERS));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 
