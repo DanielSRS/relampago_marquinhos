@@ -6,7 +6,7 @@ Relâmpago Marquinhos is a TypeScript-based project designed to manage electric 
 
 To set up the environment, ensure you have the following installed:
 
-1. **Node.js**: Install the latest stable version of Node.js from [Node.js official website](https://nodejs.org/).
+1. **Node.js**: Install version 23 or later of Node.js from [Node.js official website](https://nodejs.org/).
 2. **Corepack**: Corepack is included with Node.js starting from version 16.10.0. Enable it by running:
    ```bash
    corepack enable
@@ -90,13 +90,13 @@ The project is organized as follows:
 ### Start the Server
 To start the server, run:
 ```bash
-yarn run runserver
+yarn runserver
 ```
 
 ### Run the Car Client
 To simulate a car client, run:
 ```bash
-yarn run runcar
+yarn runcar
 ```
 
 ### Run Tests
