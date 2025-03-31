@@ -2,9 +2,16 @@
   "name": "relempago_marquinhos",
   "main": "src/main.ts",
   "type": "module",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*"
+    ]
+  },
   "scripts": {
     "start": "node src/main.ts",
     "test": "vitest",
+    "check": "tsc",
     "lint": "eslint .",
     "runcar": "node src/car.ts",
     "runserver": "node --watch src/server.ts"
