@@ -5,6 +5,7 @@ import type {
   ErrorResponse,
   ChargeRecord,
   Charge,
+  Station,
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
@@ -17,7 +18,7 @@ import { curry } from '../../utils.ts';
  * Remover a reserva se houver
  * Criar e salvar o Charge
  */
-export const startChaging = curry(
+export const startCharging = curry(
   (
     stations: StationGroup,
     users: UserGroup,
@@ -25,9 +26,10 @@ export const startChaging = curry(
     data: {
       stationId: number;
       userId: number;
+      battery_level: number
     },
   ) => {
-    const { stationId, userId } = data;
+    const { stationId, userId, battery_level } = data;
     const station = stations[stationId];
     if (!station) {
       return {
@@ -72,7 +74,7 @@ export const startChaging = curry(
     const newChage: Charge = {
       // MUDAR ISSO AQUI
       chargeId: Object.values(chargeGroup).length,
-      cost: 0,
+      cost: battery_level*6.02,
       endTime: startDate,
       startTime: startDate,
       stationId: station.id,
@@ -82,13 +84,21 @@ export const startChaging = curry(
     chargeGroup[newChage.chargeId] = newChage;
 
     // Deixar typescript feliz depois
-    station.state = 'charging-car';
-    station.onUse = newChage.chargeId;
+    occupyStation(station, newChage.chargeId);
 
     return {
-      message: 'Charging has been succesfully initialized',
+      message: 'Recharging has been succesfully initialized',
       success: true,
       data: newChage,
     } satisfies Response<Charge>;
   },
 );
+
+function occupyStation(station: Station, chargeId: number) {
+  station.state = 'charging-car';
+  if (station.state === 'charging-car') {
+    station.onUse = chargeId;
+  } else {
+    throw 'this should never happens'
+  }
+}
