@@ -53,8 +53,7 @@ export function Station(
   return {
     id,
     state,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onUse: undefined as any,
+    onUse: -1,
     location: {
       x,
       y,
@@ -72,9 +71,16 @@ export type RequestMap = {
   getSuggestions: Car;
   registerStation: Station;
   registerUser: User;
-  startChaging: {
+  startCharging: {
     stationId: number;
     userId: number;
+    battery_level: number;
+  };
+  endCharging: {
+    chargeId: number;
+    stationId: number;
+    userId: number;
+    battery_level: number;
   };
 };
 
@@ -99,12 +105,22 @@ export type Request =
       data: User;
     }
   | {
-      type: 'startChaging';
+      type: 'startCharging';
       data: {
         stationId: number;
         userId: number;
+        battery_level: number;
+      };
+    } 
+  | {
+      type: 'endCharging';
+      data: {
+        stationId: number;
+        userId: number;
+        battery_level: number;
       };
     };
+    
 
 export type Response<T> = {
   message: string;
