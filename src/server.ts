@@ -16,7 +16,8 @@ import { carSchema } from './schemas/carSchema.ts';
 import { stationSchema } from './schemas/stationSchema.ts';
 import { registerUser } from './server/routes/registerCar.ts';
 import { userSchema } from './schemas/userSchema.ts';
-import { startChaging } from './server/routes/startCharging.ts';
+import { startCharging } from './server/routes/startCharging.ts';
+import { endCharging } from './server/routes/endCharging.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -120,10 +121,19 @@ export const connectionSchema = z.discriminatedUnion('type', [
     data: userSchema,
   }),
   z.object({
-    type: z.literal('startChaging'),
+    type: z.literal('startCharging'),
     data: z.object({
       stationId: z.number(),
       userId: z.number(),
+      battery_level: z.number(),
+    }),
+  }),
+  z.object({
+    type: z.literal('endCharging'),
+    data: z.object({
+      stationId: z.number(),
+      userId: z.number(),
+      battery_level: z.number(),
     }),
   }),
 ]);
@@ -163,7 +173,8 @@ const server = net.createServer(socket => {
       .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
       .add('registerStation', registerStation(STATIONS))
       .add('registerUser', registerUser(USERS))
-      .add('startChaging', startChaging(STATIONS, USERS, CHARGES));
+      .add('startCharging', startCharging(STATIONS, USERS, CHARGES))
+      .add('endCharging', endCharging(STATIONS, USERS, CHARGES));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 
