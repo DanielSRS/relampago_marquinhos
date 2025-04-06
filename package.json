@@ -9,12 +9,12 @@
     ]
   },
   "scripts": {
-    "start": "node src/main.ts",
+    "start": "node --experimental-strip-types src/main.ts",
     "test": "vitest",
     "check": "tsc",
     "lint": "eslint .",
-    "runcar": "node src/car.ts",
-    "runserver": "node --watch src/server.ts"
+    "runcar": "node --experimental-strip-types src/car.ts",
+    "runserver": "node --experimental-strip-types --watch src/server.ts"
   },
   "dependencies": {
     "@types/node": "^22.13.14",
