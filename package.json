@@ -14,7 +14,7 @@
     "check": "tsc",
     "lint": "eslint .",
     "runcar": "node --experimental-strip-types src/car.ts",
-    "runstation": "node --experimental-strip-types src/station.ts",
+    "runstation": "cls && node --no-warnings --experimental-strip-types src/station.ts",
     "runserver": "node --experimental-strip-types --watch src/server.ts"
   },
   "dependencies": {
