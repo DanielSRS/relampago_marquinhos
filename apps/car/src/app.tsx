@@ -1,6 +1,8 @@
 import React from 'react';
-import { Box, Text, useApp, useInput } from 'ink';
+import { View } from './components/View/View.js';
 import { AppRegistry } from './appRegistry.js';
+import { Text, useApp, useInput } from 'ink';
+import type { ViewStyles } from './components/View/View.js';
 
 export default function App() {
 	const { exit } = useApp();
@@ -11,19 +13,20 @@ export default function App() {
 	});
 
 	return (
-		<Box
-			flexDirection="column"
-			borderStyle="round"
-			// borderColor="red"
-			flexBasis={0}
-			flexGrow={1}
-			flexShrink={1}
-			overflow="hidden">
+		<View style={container}>
 			<Text>
 				Press <Text color={'red'}>q</Text> to exit
 			</Text>
-		</Box>
+		</View>
 	);
 }
+
+const container: ViewStyles = {
+	flexBasis: 0,
+	flexShrink: 1,
+	flexGrow: 1,
+	overflow: 'hidden',
+	borderStyle: 'round',
+};
 
 AppRegistry.registerComponent('Car', App);

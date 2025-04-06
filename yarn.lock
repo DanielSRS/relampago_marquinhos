@@ -2022,6 +2022,7 @@ __metadata:
     meow: "npm:^11.0.0"
     prettier: "npm:^2.8.7"
     react: "npm:^18.2.0"
+    shared: "workspace:*"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.3"
     xo: "npm:^0.53.1"
@@ -6502,6 +6503,12 @@ __metadata:
   checksum: 10c0/ca5c3ccbba479d07c30460e367e66337cec825560b11e8ba9c5ebe13a2a0d6021ae34eddf94ff3dfe17a3104dc1f191519cb6c48378b503e5c3f36393938776a
   languageName: node
   linkType: hard
+
+"shared@workspace:*, shared@workspace:apps/shared":
+  version: 0.0.0-use.local
+  resolution: "shared@workspace:apps/shared"
+  languageName: unknown
+  linkType: soft
 
 "shebang-command@npm:^2.0.0":
   version: 2.0.0
