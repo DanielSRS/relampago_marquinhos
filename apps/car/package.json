@@ -10,7 +10,8 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsc --watch",
-		"start": "node dist/app.js",
+		"start": "node dist/apps/car/src/app.js",
+		"logs": "node dist/apps/car/src/utils/logServer.js",
 		"test": "prettier --check . && xo && ava"
 	},
 	"files": [
