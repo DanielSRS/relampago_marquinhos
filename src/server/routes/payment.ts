@@ -9,6 +9,7 @@ import type {
    * Se o cliente existe
    * Se a recarga existe
    * Se a recarga é desse cliente
+   * Faz o pagamento
    */
 export const payment = curry(
   (
@@ -16,10 +17,11 @@ export const payment = curry(
     chargeGroup: ChargeRecord,
     data: {
       userId: number;
-      chargeId: number; 
+      chargeId: number;
+      hasPaid: boolean;
     },
   ) => {
-    const { userId, chargeId } = data;
+    const { userId, chargeId} = data;
 
     const user = users[userId];
     if (!user) {
@@ -30,16 +32,25 @@ export const payment = curry(
       } satisfies ErrorResponse<unknown>;
     }
 
-    const existsAndBelongs = Object.values(chargeGroup).some(
+    const recharge = Object.values(chargeGroup).find(
     (recharge) => recharge.chargeId === chargeId && recharge.userId === userId
     );
 
-    if (!existsAndBelongs) {
+    if (!recharge) {
       return {
         message: 'Recharge not found or does not belong to the user.',
         success: false,
         error: 'this field is not optional',
       } satisfies ErrorResponse<unknown>;
     }
+
+    recharge.hasPaid = true;
+
+    return {
+      message: 'Payment processed successfully.',
+      success: true,
+      error: null,
+      updatedRecharge: recharge
+    };
   }
 );
