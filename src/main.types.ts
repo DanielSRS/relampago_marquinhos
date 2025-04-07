@@ -17,6 +17,7 @@ export type Charge = {
   startTime: Date;
   endTime: Date;
   cost: number;
+  hasPaid: boolean;
 };
 
 export type Station = {
@@ -81,6 +82,9 @@ export type RequestMap = {
     stationId: number;
     userId: number;
     battery_level: number;
+  };
+  rechargeList: {
+    userId: number;
   };
 };
 

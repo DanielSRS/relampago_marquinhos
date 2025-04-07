@@ -18,6 +18,7 @@ import { registerUser } from './server/routes/registerCar.ts';
 import { userSchema } from './schemas/userSchema.ts';
 import { startCharging } from './server/routes/startCharging.ts';
 import { endCharging } from './server/routes/endCharging.ts';
+import { rechargeList } from './server/routes/rechargeList.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -136,6 +137,12 @@ export const connectionSchema = z.discriminatedUnion('type', [
       battery_level: z.number(),
     }),
   }),
+  z.object({
+    type: z.literal('rechargeList'),
+    data: z.object({
+      userId: z.number(),
+    }),
+  }),
 ]);
 
 const log = Logger.extend('Server');
@@ -174,7 +181,8 @@ const server = net.createServer(socket => {
       .add('registerStation', registerStation(STATIONS))
       .add('registerUser', registerUser(USERS))
       .add('startCharging', startCharging(STATIONS, USERS, CHARGES))
-      .add('endCharging', endCharging(STATIONS, USERS, CHARGES));
+      .add('endCharging', endCharging(STATIONS, USERS, CHARGES))
+      .add('rechargeList', rechargeList(USERS, CHARGES));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 

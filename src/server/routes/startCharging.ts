@@ -79,6 +79,7 @@ export const startCharging = curry(
       startTime: startDate,
       stationId: station.id,
       userId: user.id,
+      hasPaid: false,
     };
 
     chargeGroup[newChage.chargeId] = newChage;
