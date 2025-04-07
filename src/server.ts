@@ -19,6 +19,7 @@ import { userSchema } from './schemas/userSchema.ts';
 import { startCharging } from './server/routes/startCharging.ts';
 import { endCharging } from './server/routes/endCharging.ts';
 import { rechargeList } from './server/routes/rechargeList.ts';
+import { payment } from './server/routes/payment.ts';
 
 const HOST = 'localhost';
 const PORT = 8080;
@@ -182,7 +183,8 @@ const server = net.createServer(socket => {
       .add('registerUser', registerUser(USERS))
       .add('startCharging', startCharging(STATIONS, USERS, CHARGES))
       .add('endCharging', endCharging(STATIONS, USERS, CHARGES))
-      .add('rechargeList', rechargeList(USERS, CHARGES));
+      .add('rechargeList', rechargeList(USERS, CHARGES))
+      .add('payment', payment(USERS, CHARGES));
 
     const response = router.all()[data.data.type]?.(data.data.data);
 
