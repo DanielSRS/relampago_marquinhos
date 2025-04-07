@@ -12,10 +12,15 @@ type Color = ComponentProps<typeof Box>['borderColor'];
 interface ViewProps {
 	readonly children?: React.ReactElement | React.ReactElement[];
 	readonly style?: ViewStyles;
+	onLayout?: (event: {
+		nativeEvent: {
+			layout: { width: number; height: number };
+		};
+	}) => void;
 }
 
 export function View(props: ViewProps) {
-	const { style } = props;
+	const { style, onLayout } = props;
 	const childrenContainerRef = useRef<DOMElement>(null);
 	const { stdout } = useStdout();
 	const [size, setSize] = useState({
@@ -30,6 +35,11 @@ export function View(props: ViewProps) {
 
 		const newSize = measureElement(childrenContainerRef.current);
 		setSize(newSize);
+		onLayout?.({
+			nativeEvent: {
+				layout: newSize,
+			},
+		});
 	}
 
 	useEffect(calcSize, []);
