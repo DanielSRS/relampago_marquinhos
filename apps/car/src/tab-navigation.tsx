@@ -7,6 +7,7 @@ import { Recomendations } from './Pages/Recomendations/Recomendations.js';
 import { Computed } from '@legendapp/state/react';
 import { SharedData } from './store/shared-data.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
+import { Charging } from './Pages/Charging/Charging.js';
 
 export function TabNavigation() {
 	const [activeTabName, setActiveTabName] = useState<string>('foo');
@@ -33,7 +34,7 @@ export function TabNavigation() {
 					useTab: false,
 					useNumbers: false,
 				}}>
-				<Tab name="foo">Foo</Tab>
+				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
 				<Tab name="baz">Baz</Tab>
 			</Tabs>
@@ -45,12 +46,7 @@ export function TabNavigation() {
 function TabContent(props: { activeTab: string }) {
 	switch (props.activeTab) {
 		case 'foo':
-			return (
-				<View style={{ ...FLEX1, backgroundColor: 'red' }}>
-					{}
-					{}
-				</View>
-			);
+			return <Charging />;
 			break;
 		case 'bar':
 			return (
