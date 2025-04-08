@@ -649,6 +649,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@legendapp/state@npm:^3.0.0-beta.30":
+  version: 3.0.0-beta.30
+  resolution: "@legendapp/state@npm:3.0.0-beta.30"
+  dependencies:
+    use-sync-external-store: "npm:^1.2.2"
+  peerDependencies:
+    expo-sqlite: ^15.0.0
+  peerDependenciesMeta:
+    expo-sqlite:
+      optional: true
+  checksum: 10c0/f6227417956cf349c08c4bc630713081ccf4c1ecf8e12dc78e52f1306e2e7f158f674c8d461dc88668a4d4da33966b4ca935a2548de447e05aa5fbec8c3118fd
+  languageName: node
+  linkType: hard
+
 "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1":
   version: 5.1.1-v1
   resolution: "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1"
@@ -2009,6 +2023,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "car@workspace:apps/car"
   dependencies:
+    "@legendapp/state": "npm:^3.0.0-beta.30"
     "@sindresorhus/tsconfig": "npm:^3.0.1"
     "@types/react": "npm:^18.0.32"
     "@vdemedes/prettier-config": "npm:^2.0.1"
@@ -7477,6 +7492,15 @@ __metadata:
   version: 2.3.2
   resolution: "url-or-path@npm:2.3.2"
   checksum: 10c0/0611959922600b109cee12ed485a0be5057ed45d385bc389d44e6b0eb1963c5afc0be062f15b36810c9c9b53cf0c36ec964be46444907c4eaa09cf2ff0bc0a42
+  languageName: node
+  linkType: hard
+
+"use-sync-external-store@npm:^1.2.2":
+  version: 1.5.0
+  resolution: "use-sync-external-store@npm:1.5.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/1b8663515c0be34fa653feb724fdcce3984037c78dd4a18f68b2c8be55cc1a1084c578d5b75f158d41b5ddffc2bf5600766d1af3c19c8e329bb20af2ec6f52f4
   languageName: node
   linkType: hard
 

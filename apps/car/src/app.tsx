@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { AppRegistry } from './appRegistry.js';
 import { useApp, useInput } from 'ink';
-import { type Station, type User } from '../../../src/main.types.js';
+import { type Station } from '../../../src/main.types.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
 import { Recomendations } from './Pages/Recomendations/Recomendations.js';
+import { SharedData } from './store/shared-data.js';
+import { use$ } from '@legendapp/state/react';
 
-const carLocation = {
-	x: 10,
-	y: 10,
-};
 // const log = Logger.extend('App');
 
 export default function App() {
 	const { exit } = useApp();
-	const [user, setUser] = useState<User>();
+	const car = use$(SharedData.car);
 	// const [screen, setScreen] = useState(0);
 	const [selectedStation, setSelectedStation] = useState<Station>();
 	useInput(input => {
@@ -23,14 +21,26 @@ export default function App() {
 		}
 	});
 
-	if (user === undefined) {
-		return <RegisterUser onUserCreated={setUser} />;
+	if (car === undefined) {
+		return (
+			<RegisterUser
+				onUserCreated={user => {
+					SharedData.car.set({
+						...user,
+						location: {
+							x: 0,
+							y: 0,
+						},
+					});
+				}}
+			/>
+		);
 	}
 
 	if (!selectedStation) {
 		return (
 			<Recomendations
-				location={carLocation}
+				location={car.location}
 				onSelectStation={setSelectedStation}
 			/>
 		);
@@ -39,7 +49,7 @@ export default function App() {
 		<ReserveStation
 			station={selectedStation}
 			onGoBack={() => setSelectedStation(undefined)}
-			user={user}
+			user={car}
 		/>
 	);
 }
