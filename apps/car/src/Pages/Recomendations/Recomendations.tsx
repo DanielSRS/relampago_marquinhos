@@ -5,7 +5,7 @@ import type { Station, Position } from '../../../../../src/main.types.js';
 // import { Logger } from '../../utils/utils.js';
 import { FLEX1 } from '../../constants.js';
 import { SuggestionsList } from './components/suggestions-list.js';
-import { use$ } from '@legendapp/state/react';
+import { Computed, use$ } from '@legendapp/state/react';
 import { getSuggestions, SharedData } from '../../store/shared-data.js';
 
 // const log = Logger.extend('Recomendations');
@@ -64,8 +64,19 @@ export function Recomendations(props: RecomendationsProps) {
 						<View style={{ marginTop: -1 }}>
 							<Text>Posição</Text>
 						</View>
-						<Text>x: {1}</Text>
-						<Text>y: {1}</Text>
+						<Computed>
+							{() => {
+								const pos = SharedData.car.location.get();
+								const x = pos?.x ?? -1
+								const y = pos?.y ?? -1
+								return (
+									<>
+									<Text>x: {x}</Text>
+									<Text>y: {y}</Text>
+									</>
+								)
+							}}
+						</Computed>
 					</View>
 
 					{/* Battery level*/}
@@ -73,7 +84,9 @@ export function Recomendations(props: RecomendationsProps) {
 						<View style={{ marginTop: -1 }}>
 							<Text>Nível da bateria</Text>
 						</View>
-						<Text>{1}%</Text>
+						<Computed>
+							{() => <Text>{SharedData.battery_level.get()}%</Text>}
+						</Computed>
 					</View>
 				</View>
 				<View>

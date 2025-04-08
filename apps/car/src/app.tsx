@@ -24,17 +24,21 @@ export default function App() {
 					SharedData.car.set({
 						...user,
 						location: {
-							x: 0,
-							y: 0,
+							x: getRandomNumber(0, 200),
+							y: getRandomNumber(0, 200),
 						},
 					});
-					SharedData.battery_level.set(50);
+					SharedData.battery_level.set( getRandomNumber(20, 95),);
 				}}
 			/>
 		);
 	}
 
 	return <TabNavigation />;
+}
+
+function getRandomNumber(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 AppRegistry.registerComponent('Car', App);
