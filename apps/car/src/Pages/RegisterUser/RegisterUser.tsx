@@ -4,22 +4,23 @@ import { View } from '../../components/View/View.js';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import { tcpRequest } from '../../tcp/tcp.js';
+import Spinner from 'ink-spinner';
+import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import type { Request, User, Response } from '../../../../../src/main.types.js';
-
-const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
-const SERVER_HOST = 'localhost'; //server IP
-const SERVER_PORT = 8080; // server port
 
 export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 	const { onUserCreated } = props;
 	const [id, setId] = useState<number>();
+	const [idField, setIdFiled] = useState('');
 	const [tcpErrorMsg, settcpErrorMsg] = useState<string>();
+	const [creatingUser, setCreatingUser] = useState(false);
 
 	const createUser = async () => {
 		if (id === undefined || typeof id !== 'number') {
 			return;
 		}
 		// Start loading
+		setCreatingUser(true);
 		const res = await tcpRequest(
 			{
 				type: 'registerUser',
@@ -30,10 +31,11 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 			SERVER_HOST,
 			SERVER_PORT,
 		);
+		setCreatingUser(false);
 
 		// TCP connection error
 		if (res.type === 'error') {
-			settcpErrorMsg(res.message);
+			settcpErrorMsg(res.error + '');
 			return;
 		}
 
@@ -42,6 +44,31 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 
 		// End loading
 	};
+
+	/**
+	 * Show loading indicator while creating user
+	 */
+	if (creatingUser) {
+		return (
+			// Fill entire screen and center elements
+			<View
+				style={{ ...FLEX1, justifyContent: 'center', alignItems: 'center' }}>
+				{/* Box with green border */}
+				<View
+					style={{
+						padding: 2,
+						borderStyle: 'round',
+						borderColor: 'green',
+						flexDirection: 'row',
+						gap: 2,
+					}}>
+					{/* Description text with a loading indicator */}
+					<Text>Creating user</Text>
+					<Spinner type="dots12" />
+				</View>
+			</View>
+		);
+	}
 
 	return (
 		<View style={FLEX1}>
@@ -54,8 +81,10 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 				<View>
 					<Text>Input the user id: </Text>
 					<TextInput
-						value={''}
-						onChange={value => {
+						value={idField}
+						onChange={setIdFiled}
+						placeholder="It needs to be a number"
+						onSubmit={value => {
 							const parsed = parseInt(value);
 							if (Number.isNaN(parsed)) {
 								// erro
@@ -68,14 +97,19 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 			) : (
 				<Text></Text>
 			)}
+			<Text>{tcpErrorMsg}</Text>
 
 			{/* Create user */}
 			{id ? (
 				<SelectInput
 					items={[
 						{
-							label: 'Criar usuário',
+							label: 'Criar usuário com id: ' + id,
 							value: 'reserve',
+						},
+						{
+							label: 'Cancelar',
+							value: 'cancel',
 						},
 						tcpErrorMsg
 							? {
@@ -87,6 +121,10 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 					onSelect={item => {
 						if (item.value === 'reserve') {
 							createUser();
+						}
+						if (item.value === 'cancel') {
+							setIdFiled('');
+							setId(undefined);
 						}
 					}}
 				/>

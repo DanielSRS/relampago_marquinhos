@@ -10,4 +10,4 @@ RUN yarn
 
 COPY . .
 
-CMD ["yarn", "runserver"]
+CMD ["yarn", "runstation"]

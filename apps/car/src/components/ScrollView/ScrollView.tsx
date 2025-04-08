@@ -184,6 +184,7 @@ function ScrollStats(props: {
 				marginTop: -1,
 				paddingLeft: 1,
 				backgroundColor: 'gray',
+				display: 'none',
 			}}>
 			<Text>Scrollview size: {viewportHeight}</Text>
 			<Text>Content size: {contentHeight}</Text>

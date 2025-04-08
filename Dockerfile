@@ -2,8 +2,10 @@ FROM node:23-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY yarn.lock ./
 
-RUN npm install
+RUN corepack enable
+RUN yarn
 
 COPY . .
