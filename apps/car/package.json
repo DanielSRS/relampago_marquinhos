@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
+		"build_and_run": "yarn build && yarn start",
 		"dev": "tsc --watch",
 		"start": "node dist/apps/car/src/app.js",
 		"logs": "node dist/apps/car/src/utils/logServer.js",
