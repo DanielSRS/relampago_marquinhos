@@ -9,3 +9,5 @@ RUN corepack enable
 RUN yarn
 
 COPY . .
+
+CMD ["yarn", "runstation"]

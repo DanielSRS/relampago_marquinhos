@@ -2,10 +2,12 @@ FROM node:23
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY yarn.lock ./
 
-RUN npm install
+RUN corepack enable
+RUN yarn
 
 COPY . .
 
-CMD ["npm", "run", "runserver"]
+CMD ["yarn", "runserver"]
