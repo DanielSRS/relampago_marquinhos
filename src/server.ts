@@ -190,7 +190,12 @@ const server = net.createServer(socket => {
       .add('reserve', data => {
         // Remover carro da lista de sugestões
 
-        const result = addReservation(STATIONS, USERS, data.stationId, data.userId);
+        const result = addReservation(
+          STATIONS,
+          USERS,
+          data.stationId,
+          data.userId,
+        );
         return {
           message: result.message,
           success: result.success,
