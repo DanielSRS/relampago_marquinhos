@@ -53,4 +53,6 @@ async function start() {
   client.on('error', err => log.error(`Error: `, err));
 }
 
-start();
+setTimeout(() => {
+  start();
+}, 3000);
