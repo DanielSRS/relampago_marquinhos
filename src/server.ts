@@ -28,6 +28,7 @@ const MAX_RADIUS = 8000;
 const addReservation = curry(
   (
     stations: StationGroup,
+    users: UserGroup,
     idStation: number,
     idUser: number,
   ): {
@@ -41,6 +42,14 @@ const addReservation = curry(
       return {
         success: false,
         message: 'station does not exist',
+      };
+    }
+
+    const user = users[idUser];
+    if (!user) {
+      return {
+        message: 'User does not exist',
+        success: false,
       };
     }
 
@@ -179,7 +188,7 @@ const server = net.createServer(socket => {
       .add('reserve', data => {
         // Remover carro da lista de sugestões
 
-        const result = addReservation(STATIONS, data.stationId, data.userId);
+        const result = addReservation(STATIONS, USERS, data.stationId, data.userId);
         return {
           message: result.message,
           success: result.success,
