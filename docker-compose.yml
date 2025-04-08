@@ -1,0 +1,27 @@
+services:
+  runstation:
+    build: .
+    container_name: station-service
+    command: npm run runstation
+    networks:
+      - my-bridge
+
+  runcar:
+    build: .
+    container_name: car-service
+    command: npm run runcar
+    networks:
+      - my-bridge
+
+  runserver:
+    build: .
+    container_name: server-service
+    command: npm run runserver
+    ports:
+      - "8080:8080"
+    networks:
+      - my-bridge
+
+networks:
+  my-bridge:
+    driver: bridge
