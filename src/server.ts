@@ -55,6 +55,12 @@ const addReservation = curry(
 
     // verificar se ja tem reserva
     const hasReservationOnThisStation = station.reservations.includes(idUser);
+    if (hasReservationOnThisStation) {
+      return {
+        success: true,
+        message: `You already have a reservation on this station: ${station.id}`,
+      };
+    }
 
     const hasAnyOtherReservation = Object.entries(stations).reduce(
       (prev, station) => {
@@ -66,16 +72,11 @@ const addReservation = curry(
     if (hasAnyOtherReservation) {
       return {
         success: false,
-        message: 'There is already a reservation',
+        message: 'You already have a reservation on another station',
       };
     }
 
-    // Verificar se carro tem reserva em algum posto
-    if (!hasReservationOnThisStation) {
-      // faz a reseva
-      station.reservations.push(idUser);
-    }
-
+    station.reservations.push(idUser);
     station.state = 'reserved';
 
     // retorna sucesso
