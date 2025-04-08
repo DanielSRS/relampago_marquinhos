@@ -76,6 +76,8 @@ const addReservation = curry(
       station.reservations.push(idUser);
     }
 
+    station.state = 'reserved';
+
     // retorna sucesso
     return {
       success: true,
