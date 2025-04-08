@@ -32,13 +32,13 @@ export function ChargesList(props: ChargesListProps) {
 						}
 						const startOffset = scrollRef.current.getScrollOffset();
 						// const viewportHeight = scrollRef.current.getViewportSize();
-						const itemOffset = index * 6;
+						const itemOffset = index * 8;
 						Logger.error('Item offset: ', startOffset, itemOffset);
 						if (startOffset < itemOffset) {
-							scrollRef.current.scrollTo(index * 6);
+							scrollRef.current.scrollTo(index * 8);
 						}
 						if (itemOffset + 6 < startOffset) {
-							scrollRef.current.scrollTo(index * 6);
+							scrollRef.current.scrollTo(index * 8);
 						}
 					}}
 					onPress={() => {
