@@ -11,6 +11,7 @@ import {
 	ScrollView,
 	type ScrollViewRef,
 } from './components/ScrollView/ScrollView.js';
+import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 
 const SERVER_HOST = 'localhost'; //server IP
 const SERVER_PORT = 8080; // server port
@@ -20,9 +21,12 @@ const carLocation = {
 	y: 10,
 };
 const log = Logger.extend('App');
+
 export default function App() {
 	const { exit } = useApp();
 	const [suggestions, setSuggestions] = useState<Station[]>([]);
+	// const [screen, setScreen] = useState(0);
+	const [selectedStation, setSelectedStation] = useState<Station>();
 	useInput(input => {
 		if (input === 'q') {
 			exit();
@@ -53,38 +57,56 @@ export default function App() {
 		log.error('Error: ', res.message, res.error);
 	}
 
-	return (
-		<View style={container}>
-			<View style={{ flexDirection: 'row', backgroundColor: 'gray' }}>
-				{/* Position card */}
-				<View style={{ padding: 1 }}>
-					<View style={{ marginTop: -1 }}>
-						<Text>Posição</Text>
+	if (!selectedStation) {
+		return (
+			<View style={container}>
+				<View style={{ flexDirection: 'row', backgroundColor: 'gray' }}>
+					{/* Position card */}
+					<View style={{ padding: 1 }}>
+						<View style={{ marginTop: -1 }}>
+							<Text>Posição</Text>
+						</View>
+						<Text>x: {1}</Text>
+						<Text>y: {1}</Text>
 					</View>
-					<Text>x: {1}</Text>
-					<Text>y: {1}</Text>
-				</View>
 
-				{/* Battery level*/}
-				<View style={{ padding: 1 }}>
-					<View style={{ marginTop: -1 }}>
-						<Text>Nível da bateria</Text>
+					{/* Battery level*/}
+					<View style={{ padding: 1 }}>
+						<View style={{ marginTop: -1 }}>
+							<Text>Nível da bateria</Text>
+						</View>
+						<Text>{1}%</Text>
 					</View>
-					<Text>{1}%</Text>
 				</View>
+				<View style={{ backgroundColor: 'gray' }}>
+					<Text>
+						Press <Text color={'red'}>q</Text> to exit
+					</Text>
+				</View>
+				<View style={{ backgroundColor: 'gray' }}>
+					<Text backgroundColor="gray">
+						Press <Text color={'blue'}>s</Text> to get suggestions
+					</Text>
+				</View>
+				<SuggestionsList
+					suggestions={suggestions}
+					onSelectStation={s => {
+						// Atualiza as sugestões apos voltar da página de reserva
+						// Caso o usuário tenha reservado algum posto
+						if (suggestions.length > 0) {
+							getSuggestions();
+						}
+						setSelectedStation(s);
+					}}
+				/>
 			</View>
-			<View style={{ backgroundColor: 'gray' }}>
-				<Text>
-					Press <Text color={'red'}>q</Text> to exit
-				</Text>
-			</View>
-			<View style={{ backgroundColor: 'gray' }}>
-				<Text backgroundColor="gray">
-					Press <Text color={'blue'}>s</Text> to get suggestions
-				</Text>
-			</View>
-			<SuggestionsList suggestions={suggestions} />
-		</View>
+		);
+	}
+	return (
+		<ReserveStation
+			station={selectedStation}
+			onGoBack={() => setSelectedStation(undefined)}
+		/>
 	);
 }
 
@@ -126,8 +148,11 @@ const Suggestion = (props: {
 		</View>
 	);
 };
-const SuggestionsList = (props: { suggestions: Station[] }) => {
-	const { suggestions } = props;
+const SuggestionsList = (props: {
+	suggestions: Station[];
+	onSelectStation?: (station: Station) => void;
+}) => {
+	const { suggestions, onSelectStation } = props;
 	const scrollRef = useRef<ScrollViewRef>(null);
 	if (suggestions.length === 0) {
 		return <Text>Sem sugestões</Text>;
@@ -155,6 +180,7 @@ const SuggestionsList = (props: { suggestions: Station[] }) => {
 					}}
 					onPress={() => {
 						Logger.info('Selected station: ', station);
+						onSelectStation?.(station);
 					}}
 				/>
 			))}

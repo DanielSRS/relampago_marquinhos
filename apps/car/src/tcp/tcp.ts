@@ -12,9 +12,11 @@ type TCTRes =
 			error: unknown;
 	  };
 
+export type TCPResponse = TCTRes;
+
 const log = Logger.extend('tcpRequest');
 export const tcpRequest = (data: object, host: string, port: number) => {
-	return new Promise<TCTRes>(resolve => {
+	return new Promise<TCPResponse>(resolve => {
 		let done = false;
 		const client = new net.Socket();
 		client.connect(port, host, () => {
