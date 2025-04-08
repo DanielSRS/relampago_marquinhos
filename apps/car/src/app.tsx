@@ -13,6 +13,7 @@ import {
 } from './components/ScrollView/ScrollView.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
+import { FLEX1 } from './constants.js';
 
 const SERVER_HOST = 'localhost'; //server IP
 const SERVER_PORT = 8080; // server port
@@ -66,45 +67,61 @@ export default function App() {
 	if (!selectedStation) {
 		return (
 			<View style={container}>
-				<View style={{ flexDirection: 'row', backgroundColor: 'gray' }}>
-					{/* Position card */}
-					<View style={{ padding: 1 }}>
-						<View style={{ marginTop: -1 }}>
-							<Text>Posição</Text>
+				<View
+					style={{
+						...FLEX1,
+						// Header size
+						marginTop: 9,
+					}}>
+					<SuggestionsList
+						suggestions={suggestions}
+						onSelectStation={s => {
+							// Atualiza as sugestões apos voltar da página de reserva
+							// Caso o usuário tenha reservado algum posto
+							if (suggestions.length > 0) {
+								getSuggestions();
+							}
+							setSelectedStation(s);
+						}}
+					/>
+				</View>
+				{/* Header */}
+				<View
+					style={{
+						position: 'absolute',
+						width: '100%',
+						padding: 1,
+						backgroundColor: 'black',
+					}}>
+					<View style={{ flexDirection: 'row' }}>
+						{/* Position card */}
+						<View style={{ padding: 1 }}>
+							<View style={{ marginTop: -1 }}>
+								<Text>Posição</Text>
+							</View>
+							<Text>x: {1}</Text>
+							<Text>y: {1}</Text>
 						</View>
-						<Text>x: {1}</Text>
-						<Text>y: {1}</Text>
-					</View>
 
-					{/* Battery level*/}
-					<View style={{ padding: 1 }}>
-						<View style={{ marginTop: -1 }}>
-							<Text>Nível da bateria</Text>
+						{/* Battery level*/}
+						<View style={{ padding: 1 }}>
+							<View style={{ marginTop: -1 }}>
+								<Text>Nível da bateria</Text>
+							</View>
+							<Text>{1}%</Text>
 						</View>
-						<Text>{1}%</Text>
+					</View>
+					<View>
+						<Text>
+							Press <Text color={'red'}>q</Text> to exit
+						</Text>
+					</View>
+					<View>
+						<Text>
+							Press <Text color={'blue'}>s</Text> to get suggestions
+						</Text>
 					</View>
 				</View>
-				<View style={{ backgroundColor: 'gray' }}>
-					<Text>
-						Press <Text color={'red'}>q</Text> to exit
-					</Text>
-				</View>
-				<View style={{ backgroundColor: 'gray' }}>
-					<Text backgroundColor="gray">
-						Press <Text color={'blue'}>s</Text> to get suggestions
-					</Text>
-				</View>
-				<SuggestionsList
-					suggestions={suggestions}
-					onSelectStation={s => {
-						// Atualiza as sugestões apos voltar da página de reserva
-						// Caso o usuário tenha reservado algum posto
-						if (suggestions.length > 0) {
-							getSuggestions();
-						}
-						setSelectedStation(s);
-					}}
-				/>
 			</View>
 		);
 	}
@@ -200,7 +217,7 @@ const container: ViewStyles = {
 	flexShrink: 1,
 	flexGrow: 1,
 	overflow: 'hidden',
-	borderStyle: 'round',
+	// borderStyle: 'round',
 };
 
 AppRegistry.registerComponent('Car', App);
