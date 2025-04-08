@@ -64,6 +64,18 @@ export const startCharging = curry(
       } satisfies ErrorResponse<unknown>;
     }
 
+    const alredyCharging = Object.values(chargeGroup).reduce((prev, current) => {
+      return prev || (current.endTime == current.startTime) && current.userId ===userId
+    }, false);
+
+    if (alredyCharging) {
+      return {
+        message: 'User is already using a station',
+        success: true,
+        error: 'Cannot start more than one charging',
+      } satisfies ErrorResponse<unknown>;
+    }
+
     // remover reserva
     if (station.reservations[0] === userId) {
       station.reservations.splice(0, 1);

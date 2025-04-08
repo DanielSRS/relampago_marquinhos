@@ -30,7 +30,7 @@ export function Charging(props: ChargingProps) {
 		// Start loading
 		const res = await tcpRequest(
 			{
-				type: 'startCharging',
+				type: 'endCharging',
 				data: {
 					battery_level: batteryLevel,
 					stationId: charge.stationId,
