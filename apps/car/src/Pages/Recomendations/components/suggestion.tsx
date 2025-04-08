@@ -2,6 +2,8 @@ import React from 'react';
 import { View } from '../../../components/View/View.js';
 import { useEffect } from 'react';
 import { useFocus, useInput, Text } from 'ink';
+import { use$ } from '@legendapp/state/react';
+import { SharedData } from '../../../store/shared-data.js';
 import type { Station } from '../../../../../../src/main.types.js';
 
 export const Suggestion = (props: {
@@ -11,6 +13,8 @@ export const Suggestion = (props: {
 	distance: string | number;
 }) => {
 	const { station, onPress, onFocus, distance } = props;
+	const reservedStation = use$(SharedData.reservedStation);
+	const isThisReserved = station.id === reservedStation?.id;
 	const { isFocused } = useFocus();
 
 	useEffect(() => {
@@ -30,6 +34,7 @@ export const Suggestion = (props: {
 			style={{
 				borderStyle: 'round',
 				borderColor: isFocused ? 'green' : undefined,
+				backgroundColor: isThisReserved ? 'greenBright' : undefined,
 			}}>
 			<Text>Nome: {station.id}</Text>
 			<Text>Estado: {station.state}</Text>
