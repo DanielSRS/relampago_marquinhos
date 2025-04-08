@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View } from './components/View/View.js';
 import { AppRegistry } from './appRegistry.js';
-import { Text, useApp, useInput } from 'ink';
+import { Text, useApp, useFocus, useInput } from 'ink';
 import { tcpRequest } from './tcp/tcp.js';
 import { Request, type Station } from '../../../src/main.types.js';
 import type { ViewStyles } from './components/View/View.js';
 import { Logger } from './utils/utils.js';
 import { calculateDistance } from '../../../src/location.js';
-import { ScrollView } from './components/ScrollView/ScrollView.js';
+import {
+	ScrollView,
+	type ScrollViewRef,
+} from './components/ScrollView/ScrollView.js';
 
 const SERVER_HOST = 'localhost'; //server IP
 const SERVER_PORT = 8080; // server port
@@ -52,9 +55,9 @@ export default function App() {
 
 	return (
 		<View style={container}>
-			<View style={{ flexDirection: 'row' }}>
+			<View style={{ flexDirection: 'row', backgroundColor: 'gray' }}>
 				{/* Position card */}
-				<View style={{ borderStyle: 'round' }}>
+				<View style={{ padding: 1 }}>
 					<View style={{ marginTop: -1 }}>
 						<Text>Posição</Text>
 					</View>
@@ -63,28 +66,54 @@ export default function App() {
 				</View>
 
 				{/* Battery level*/}
-				<View style={{ borderStyle: 'round' }}>
+				<View style={{ padding: 1 }}>
 					<View style={{ marginTop: -1 }}>
 						<Text>Nível da bateria</Text>
 					</View>
 					<Text>{1}%</Text>
 				</View>
 			</View>
-			<Text>
-				Press <Text color={'red'}>q</Text> to exit
-			</Text>
-			<Text>
-				Press <Text color={'blue'}>s</Text> to get suggestions
-			</Text>
+			<View style={{ backgroundColor: 'gray' }}>
+				<Text>
+					Press <Text color={'red'}>q</Text> to exit
+				</Text>
+			</View>
+			<View style={{ backgroundColor: 'gray' }}>
+				<Text backgroundColor="gray">
+					Press <Text color={'blue'}>s</Text> to get suggestions
+				</Text>
+			</View>
 			<SuggestionsList suggestions={suggestions} />
 		</View>
 	);
 }
 
-const Suggestion = (props: { station: Station }) => {
-	const { station } = props;
+const Suggestion = (props: {
+	station: Station;
+	onPress?: () => void;
+	onFocus?: () => void;
+}) => {
+	const { station, onPress, onFocus } = props;
+	const { isFocused } = useFocus();
+
+	useEffect(() => {
+		if (isFocused) {
+			onFocus?.();
+		}
+	}, [isFocused]);
+
+	useInput((_input, key) => {
+		if (key.return && isFocused) {
+			onPress?.();
+		}
+	});
+
 	return (
-		<View style={{ borderStyle: 'round', borderColor: 'red' }}>
+		<View
+			style={{
+				borderStyle: 'round',
+				borderColor: isFocused ? 'green' : undefined,
+			}}>
 			<Text>Nome: {station.id}</Text>
 			<Text>Estado: {station.state}</Text>
 			<Text>Fila: {station.reservations.length}</Text>
@@ -99,13 +128,35 @@ const Suggestion = (props: { station: Station }) => {
 };
 const SuggestionsList = (props: { suggestions: Station[] }) => {
 	const { suggestions } = props;
+	const scrollRef = useRef<ScrollViewRef>(null);
 	if (suggestions.length === 0) {
 		return <Text>Sem sugestões</Text>;
 	}
 	return (
-		<ScrollView>
+		<ScrollView ref={scrollRef}>
 			{suggestions.map((station, index) => (
-				<Suggestion key={index} station={station} />
+				<Suggestion
+					key={index}
+					station={station}
+					onFocus={() => {
+						if (!scrollRef.current) {
+							return;
+						}
+						const startOffset = scrollRef.current.getScrollOffset();
+						// const viewportHeight = scrollRef.current.getViewportSize();
+						const itemOffset = index * 6;
+						Logger.error('Item offset: ', startOffset, itemOffset);
+						if (startOffset < itemOffset) {
+							scrollRef.current.scrollTo(index * 6);
+						}
+						if (itemOffset + 6 < startOffset) {
+							scrollRef.current.scrollTo(index * 6);
+						}
+					}}
+					onPress={() => {
+						Logger.info('Selected station: ', station);
+					}}
+				/>
 			))}
 		</ScrollView>
 	);
