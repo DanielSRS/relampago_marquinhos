@@ -3,7 +3,7 @@ import * as readline from 'node:readline';
 import type { Request } from './main.types.ts';
 import { Logger } from './utils.ts';
 
-const HOST = 'localhost';
+const HOST = 'runserver';
 const PORT = 8080;
 
 const log = Logger.extend('Station');

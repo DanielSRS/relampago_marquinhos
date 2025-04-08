@@ -2,7 +2,7 @@ import * as net from 'node:net';
 import type { Request } from './main.types.ts';
 import { Logger } from './utils.ts';
 
-const HOST = 'localhost'; //server IP
+const HOST = 'runserver'; //server IP
 const PORT = 8080; // server port
 
 const client = new net.Socket();
