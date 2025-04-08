@@ -5,7 +5,7 @@ import type {
   ChargeRecord,
   Charge,
 } from '../../main.types.ts';
-import { curry } from '../../utils.ts';
+import { curry, Logger } from '../../utils.ts';
 
 /**
  * Retorna a lista de recibos de recargas associados a um user
@@ -34,12 +34,14 @@ export const rechargeList = curry(
       charge => charge.userId === user.id,
     );
 
+    Logger.debug('What is the value??: ', recharge_list);
+
     if (rechargeList.length === 0) {
       return {
         message:
           'WARNING: There is no recharge receipt associated with the user!',
         success: true,
-        data: [],
+        data: recharge_list,
       } satisfies Response<Charge[]>;
     } else {
       return {
