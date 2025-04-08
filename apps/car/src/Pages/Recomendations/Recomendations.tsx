@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, type ViewStyles } from '../../components/View/View.js';
 import { Text, useInput } from 'ink';
-import type {
-	Station,
-	Request,
-	Position,
-} from '../../../../../src/main.types.js';
-import { Logger } from '../../utils/utils.js';
-import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
-import { tcpRequest } from '../../tcp/tcp.js';
+import type { Station, Position } from '../../../../../src/main.types.js';
+// import { Logger } from '../../utils/utils.js';
+import { FLEX1 } from '../../constants.js';
 import { SuggestionsList } from './components/suggestions-list.js';
+import { use$ } from '@legendapp/state/react';
+import { getSuggestions, SharedData } from '../../store/shared-data.js';
 
-const log = Logger.extend('Recomendations');
+// const log = Logger.extend('Recomendations');
 
 interface RecomendationsProps {
 	location: Position;
@@ -20,34 +17,17 @@ interface RecomendationsProps {
 
 export function Recomendations(props: RecomendationsProps) {
 	const { location, onSelectStation } = props;
-	const [suggestions, setSuggestions] = useState<Station[]>([]);
+	const suggestions = use$(SharedData.suggestions) ?? [];
+
+	const retrieveSuggestions = () => {
+		getSuggestions(location, SharedData.suggestions.set);
+	};
 
 	useInput(input => {
 		if (input === 's') {
-			getSuggestions();
+			retrieveSuggestions();
 		}
 	});
-
-	async function getSuggestions() {
-		const res = await tcpRequest(
-			{
-				type: 'getSuggestions',
-				data: {
-					id: 1,
-					location: location,
-				},
-			} satisfies Request,
-			SERVER_HOST,
-			SERVER_PORT,
-		);
-		if (res.type === 'success') {
-			// log.info('Suggestions: ', res.data);
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			setSuggestions((res.data as any).data as Station[]);
-			return;
-		}
-		log.error('Error: ', res.message, res.error);
-	}
 
 	return (
 		<View style={container}>
@@ -63,9 +43,9 @@ export function Recomendations(props: RecomendationsProps) {
 					onSelectStation={s => {
 						// Atualiza as sugestões apos voltar da página de reserva
 						// Caso o usuário tenha reservado algum posto
-						if (suggestions.length > 0) {
-							getSuggestions();
-						}
+						setTimeout(() => {
+							retrieveSuggestions();
+						}, 500);
 						onSelectStation(s);
 					}}
 				/>
