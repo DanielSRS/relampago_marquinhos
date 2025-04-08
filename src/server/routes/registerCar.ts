@@ -10,5 +10,5 @@ export const registerUser = curry((cars: UserGroup, newUser: User) => {
     message: 'User registered',
     success: true,
     data: newUser,
-  } satisfies Response<unknown>;
+  } satisfies Response<User>;
 });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, useInput } from 'ink';
 import { View } from '../../components/View/View.js';
-import type { Station, Request } from '../../../../../src/main.types.js';
+import type { Station, Request, User } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
 import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
 import SelectInput from 'ink-select-input';
@@ -18,9 +18,10 @@ const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
 export function ReserveStation(props: {
 	station: Station;
+	user: User;
 	onGoBack: () => void;
 }) {
-	const { station, onGoBack } = props;
+	const { station, onGoBack, user } = props;
 	const [response, setResponse] = useState<TCPResponse>();
 
 	useInput((input, key) => {
@@ -39,7 +40,7 @@ export function ReserveStation(props: {
 				type: 'reserve',
 				data: {
 					stationId: station.id,
-					userId: 1,
+					userId: user.id,
 				},
 			} satisfies Request,
 			SERVER_HOST,

@@ -3,7 +3,7 @@ import { View } from './components/View/View.js';
 import { AppRegistry } from './appRegistry.js';
 import { Text, useApp, useFocus, useInput } from 'ink';
 import { tcpRequest } from './tcp/tcp.js';
-import { Request, type Station } from '../../../src/main.types.js';
+import { Request, type Station, type User } from '../../../src/main.types.js';
 import type { ViewStyles } from './components/View/View.js';
 import { Logger } from './utils/utils.js';
 import { calculateDistance } from '../../../src/location.js';
@@ -12,6 +12,7 @@ import {
 	type ScrollViewRef,
 } from './components/ScrollView/ScrollView.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
+import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
 
 const SERVER_HOST = 'localhost'; //server IP
 const SERVER_PORT = 8080; // server port
@@ -25,6 +26,7 @@ const log = Logger.extend('App');
 export default function App() {
 	const { exit } = useApp();
 	const [suggestions, setSuggestions] = useState<Station[]>([]);
+	const [user, setUser] = useState<User>();
 	// const [screen, setScreen] = useState(0);
 	const [selectedStation, setSelectedStation] = useState<Station>();
 	useInput(input => {
@@ -55,6 +57,10 @@ export default function App() {
 			return;
 		}
 		log.error('Error: ', res.message, res.error);
+	}
+
+	if (user === undefined) {
+		return <RegisterUser onUserCreated={setUser} />;
 	}
 
 	if (!selectedStation) {
@@ -106,6 +112,7 @@ export default function App() {
 		<ReserveStation
 			station={selectedStation}
 			onGoBack={() => setSelectedStation(undefined)}
+			user={user}
 		/>
 	);
 }
