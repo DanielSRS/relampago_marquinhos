@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { useFocus, Text, useInput } from 'ink';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { Text, useInput } from 'ink';
 import { View, type ViewStyles } from '../View/View.js';
 import { Logger } from '../../utils/utils.js';
 
 type Layout = { width: number; height: number };
+
+export type ScrollViewRef = {
+	scrollTo: (
+		options?: { x?: number; y?: number; animated?: boolean } | number,
+	) => void;
+	getScrollOffset: () => number;
+	getViewportSize: () => number;
+};
 
 interface ScrollViewProps {
 	readonly children?: React.ReactElement | React.ReactElement[];
@@ -18,97 +26,118 @@ const initialLayout = {
 	width: 0,
 };
 
-export function ScrollView(props: ScrollViewProps) {
-	const { children } = props;
-	const [scrollL, setScrollL] = useState<Layout>(initialLayout);
-	const [contentl, setContentL] = useState<Layout>(initialLayout);
-	const { isFocused } = useFocus();
-	const [margin, setMargin] = useState(0);
+export const ScrollView = forwardRef<ScrollViewRef, ScrollViewProps>(
+	(props, ref) => {
+		const { children } = props;
+		const [scrollL, setScrollL] = useState<Layout>(initialLayout);
+		const [contentl, setContentL] = useState<Layout>(initialLayout);
+		// const { isFocused } = useFocus();
+		const [margin, setMargin] = useState(0);
 
-	const MAX_SIZE_TO_SCROLL = (() => {
-		if (contentl.height < scrollL.height) {
-			return 0;
-		}
-		return contentl.height - scrollL.height;
-	})();
-
-	useInput(
-		(_input, key) => {
-			// Logger.debug('key: ', input, key);
-			if (key.upArrow) {
-				if (margin === 0) {
+		useImperativeHandle(ref, () => ({
+			scrollTo(options) {
+				if (typeof options === 'number') {
+					setMargin(options);
 					return;
 				}
-				setMargin(margin - 1);
-				return;
-				// setMargin(m => {
-				// 	if (m === 0) {
-				// 		return m;
-				// 	}
-				// 	return m - 1;
-				// });
-			}
-			if (key.downArrow) {
-				if (margin === MAX_SIZE_TO_SCROLL) {
-					return;
+				if (options?.y) {
+					setMargin(options.y);
 				}
-				setMargin(margin + 1);
-				return;
-				// setMargin(m => {
-				// 	if ((m = MAX_SIZE_TO_SCROLL)) {
-				// 		return m;
-				// 	}
-				// 	return m + 1;
-				// });
+			},
+			getScrollOffset() {
+				return margin;
+			},
+			getViewportSize() {
+				return scrollL.height;
+			},
+		}));
+
+		const MAX_SIZE_TO_SCROLL = (() => {
+			if (contentl.height < scrollL.height) {
+				return 0;
 			}
-		},
-		{
-			isActive: isFocused,
-		},
-	);
+			return contentl.height - scrollL.height;
+		})();
 
-	return (
-		<View
-			onLayout={event => {
-				setScrollL(event.nativeEvent.layout);
-			}}
-			style={{
-				...scrollViewConatainer,
-				borderColor: isFocused ? 'green' : 'transparent',
-				borderStyle: isFocused ? 'round' : undefined,
-				padding: isFocused ? undefined : 1,
-			}}>
-			{/* Stats */}
-			<ScrollStats
-				contentHeight={contentl.height}
-				viewportHeight={scrollL.height}
-				margin={margin}
-				maxmargin={MAX_SIZE_TO_SCROLL}
-			/>
+		useInput(
+			(_input, key) => {
+				// Logger.debug('key: ', input, key);
+				if (key.upArrow) {
+					if (margin === 0) {
+						return;
+					}
+					setMargin(margin - 1);
+					return;
+					// setMargin(m => {
+					// 	if (m === 0) {
+					// 		return m;
+					// 	}
+					// 	return m - 1;
+					// });
+				}
+				if (key.downArrow) {
+					if (margin === MAX_SIZE_TO_SCROLL) {
+						return;
+					}
+					setMargin(margin + 1);
+					return;
+					// setMargin(m => {
+					// 	if ((m = MAX_SIZE_TO_SCROLL)) {
+					// 		return m;
+					// 	}
+					// 	return m + 1;
+					// });
+				}
+			},
+			{
+				isActive: false,
+			},
+		);
 
-			<View style={row}>
-				{/* Scroll items */}
-				<View
-					onLayout={event => {
-						setContentL(event.nativeEvent.layout);
-					}}
-					style={{ ...contentConatainer, marginTop: -margin }}>
-					{children}
-				</View>
+		return (
+			<View
+				onLayout={event => {
+					setScrollL(event.nativeEvent.layout);
+				}}
+				style={{
+					...scrollViewConatainer,
+					// borderColor: isFocused ? 'green' : 'transparent',
+					// borderStyle: isFocused ? 'round' : undefined,
+					// padding: isFocused ? undefined : 1,
+					borderStyle: undefined,
+				}}>
+				{/* Stats */}
+				<ScrollStats
+					contentHeight={contentl.height}
+					viewportHeight={scrollL.height}
+					margin={margin}
+					maxmargin={MAX_SIZE_TO_SCROLL}
+				/>
 
-				{/* Scrollbar */}
-				<View style={scrollBar}>
-					{/* Thumb */}
-					<Thumb
-						viewportSize={scrollL?.height}
-						contentSize={contentl?.height}
-						scrollbarSize={scrollL?.height}
-					/>
+				<View style={row}>
+					{/* Scroll items */}
+					<View
+						onLayout={event => {
+							setContentL(event.nativeEvent.layout);
+						}}
+						style={{ ...contentConatainer, marginTop: -margin }}>
+						{children}
+					</View>
+
+					{/* Scrollbar */}
+					<View style={scrollBar}>
+						{/* Thumb */}
+						<Thumb
+							viewportSize={scrollL?.height}
+							contentSize={contentl?.height}
+							scrollbarSize={scrollL?.height}
+						/>
+					</View>
 				</View>
 			</View>
-		</View>
-	);
-}
+		);
+	},
+);
 
 function Thumb(props: {
 	viewportSize?: number;
