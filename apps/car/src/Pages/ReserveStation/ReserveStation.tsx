@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { Text, useInput } from 'ink';
 import { View } from '../../components/View/View.js';
-import type { Station, Request, User } from '../../../../../src/main.types.js';
+import type {
+	Station,
+	Request,
+	User,
+	Charge,
+	Response,
+} from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
 import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
+import { Logger } from '../../utils/utils.js';
 
 const carLocation = {
 	x: 10,
@@ -24,6 +31,7 @@ export function ReserveStation(props: {
 }) {
 	const { station, onGoBack, user } = props;
 	const [response, setResponse] = useState<TCPResponse>();
+	const isAvaliable = station.state === 'avaliable';
 
 	useInput((input, key) => {
 		if (key.backspace) {
@@ -33,6 +41,34 @@ export function ReserveStation(props: {
 			onGoBack();
 		}
 	});
+
+	const startCharging = async () => {
+		// Start loading
+		const res = await tcpRequest(
+			{
+				type: 'startCharging',
+				data: {
+					stationId: station.id,
+					userId: user.id,
+					battery_level: SharedData.battery_level.peek() ?? 50,
+				},
+			} satisfies Request,
+			SERVER_HOST,
+			SERVER_PORT,
+		);
+		if (res.type === 'success') {
+			const apiResponse = res.data as Response<Charge>;
+			if (apiResponse.success) {
+				SharedData.chargingCar.set(apiResponse.data);
+				SharedData.reservedStation.set(undefined);
+			} else {
+				Logger.error('startCharging api error: ', apiResponse);
+			}
+		} else {
+			Logger.error('startCharging tcp error: ', res.message, res.error);
+		}
+		// End loading
+	};
 
 	const reserve = async () => {
 		// Start loading
@@ -63,7 +99,7 @@ export function ReserveStation(props: {
 	return (
 		<View style={FLEX1}>
 			<View style={{ backgroundColor: 'red', padding: 1 }}>
-				<Text>{'<--'} Press backspace to go back</Text>
+				<Text>{'<--'} Press v to go back</Text>
 			</View>
 			{/* Station info */}
 			<View
@@ -89,14 +125,23 @@ export function ReserveStation(props: {
 						label: 'Reservar',
 						value: 'reserve',
 					},
+					isAvaliable
+						? {
+								label: 'Iniciar recarga',
+								value: 'charge',
+						  }
+						: undefined,
 					{
 						label: 'Cancelar',
 						value: 'cancel',
 					},
-				]}
+				].filter(v => v !== undefined)}
 				onSelect={item => {
 					if (item.value === 'reserve') {
 						reserve();
+					}
+					if (item.value === 'charge') {
+						startCharging();
 					}
 				}}
 			/>

@@ -4,6 +4,7 @@ import type {
 	Station,
 	Request,
 	Position,
+	Charge,
 } from '../../../../src/main.types.js';
 import { SERVER_HOST, SERVER_PORT } from '../constants.js';
 import { tcpRequest } from '../tcp/tcp.js';
@@ -14,6 +15,8 @@ export const SharedData = observable<{
 	// getSuggestions: () => void;
 	suggestions: Station[];
 	reservedStation: Station;
+	battery_level: number;
+	chargingCar: Charge;
 }>();
 
 export async function getSuggestions(

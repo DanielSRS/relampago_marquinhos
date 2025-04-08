@@ -28,6 +28,7 @@ export default function App() {
 							y: 0,
 						},
 					});
+					SharedData.battery_level.set(50);
 				}}
 			/>
 		);
