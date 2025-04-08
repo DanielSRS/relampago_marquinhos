@@ -2020,6 +2020,7 @@ __metadata:
     ink: "npm:^4.1.0"
     ink-select-input: "npm:^6.0.0"
     ink-spinner: "npm:^5.0.0"
+    ink-tab: "npm:^5.1.0"
     ink-testing-library: "npm:^3.0.0"
     ink-text-input: "npm:^6.0.0"
     meow: "npm:^11.0.0"
@@ -4196,6 +4197,20 @@ __metadata:
     ink: ">=4.0.0"
     react: ">=18.0.0"
   checksum: 10c0/47b0201bc8b0b1fb475a6f8a117d5a099dde6f7ee2439b547ec60511e8460095ae6e78e8d34a7b8e54cb4c69def4310ce3649467c98ac8540d3c49ad030dd014
+  languageName: node
+  linkType: hard
+
+"ink-tab@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "ink-tab@npm:5.1.0"
+  peerDependencies:
+    "@types/react": ^18.0.0
+    ink: ^4.0.0 || ^5.0.0
+    react: ^18.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/a5de2c483972941e871f5469fd395b699073624e08c507b4469e70477e3cb75324631e43f098412d97488f90d45298aefb4b6b47f1c9356704234ea35bfebd68
   languageName: node
   linkType: hard
 
