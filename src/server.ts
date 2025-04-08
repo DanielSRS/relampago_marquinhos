@@ -21,7 +21,7 @@ import { endCharging } from './server/routes/endCharging.ts';
 import { rechargeList } from './server/routes/rechargeList.ts';
 import { payment } from './server/routes/payment.ts';
 
-const HOST = 'localhost';
+const HOST = '0.0.0.0';
 const PORT = 8080;
 const MAX_RADIUS = 8000;
 
