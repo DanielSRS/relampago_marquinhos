@@ -13,6 +13,7 @@ const SERVER_PORT = 8080; // server port
 export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 	const { onUserCreated } = props;
 	const [id, setId] = useState<number>();
+	const [idField, setIdFiled] = useState('');
 	const [tcpErrorMsg, settcpErrorMsg] = useState<string>();
 
 	const createUser = async () => {
@@ -33,7 +34,7 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 
 		// TCP connection error
 		if (res.type === 'error') {
-			settcpErrorMsg(res.message);
+			settcpErrorMsg(res.error + '');
 			return;
 		}
 
@@ -54,8 +55,10 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 				<View>
 					<Text>Input the user id: </Text>
 					<TextInput
-						value={''}
-						onChange={value => {
+						value={idField}
+						onChange={setIdFiled}
+						placeholder="It needs to be a number"
+						onSubmit={value => {
 							const parsed = parseInt(value);
 							if (Number.isNaN(parsed)) {
 								// erro
@@ -68,6 +71,7 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 			) : (
 				<Text></Text>
 			)}
+			<Text>{tcpErrorMsg}</Text>
 
 			{/* Create user */}
 			{id ? (
