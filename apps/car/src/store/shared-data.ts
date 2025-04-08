@@ -13,6 +13,7 @@ export const SharedData = observable<{
 	selectedStation: Station;
 	// getSuggestions: () => void;
 	suggestions: Station[];
+	reservedStation: Station;
 }>();
 
 export async function getSuggestions(

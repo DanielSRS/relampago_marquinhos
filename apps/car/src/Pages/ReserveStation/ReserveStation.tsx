@@ -5,6 +5,7 @@ import type { Station, Request, User } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
 import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
 import SelectInput from 'ink-select-input';
+import { SharedData } from '../../store/shared-data.js';
 
 const carLocation = {
 	x: 10,
@@ -46,6 +47,15 @@ export function ReserveStation(props: {
 			SERVER_HOST,
 			SERVER_PORT,
 		);
+		if (res.type === 'success') {
+			const apiResponse = res.data as {
+				message: string;
+				success: boolean;
+			};
+			if (apiResponse.success) {
+				SharedData.reservedStation.set(station);
+			}
+		}
 		setResponse(res);
 		// End loading
 	};
