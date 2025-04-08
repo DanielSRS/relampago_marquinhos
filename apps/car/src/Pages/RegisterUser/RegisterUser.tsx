@@ -4,6 +4,7 @@ import { View } from '../../components/View/View.js';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import { tcpRequest } from '../../tcp/tcp.js';
+import Spinner from 'ink-spinner';
 import type { Request, User, Response } from '../../../../../src/main.types.js';
 
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
@@ -15,12 +16,14 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 	const [id, setId] = useState<number>();
 	const [idField, setIdFiled] = useState('');
 	const [tcpErrorMsg, settcpErrorMsg] = useState<string>();
+	const [creatingUser, setCreatingUser] = useState(false);
 
 	const createUser = async () => {
 		if (id === undefined || typeof id !== 'number') {
 			return;
 		}
 		// Start loading
+		setCreatingUser(true);
 		const res = await tcpRequest(
 			{
 				type: 'registerUser',
@@ -31,6 +34,7 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 			SERVER_HOST,
 			SERVER_PORT,
 		);
+		setCreatingUser(false);
 
 		// TCP connection error
 		if (res.type === 'error') {
@@ -43,6 +47,31 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 
 		// End loading
 	};
+
+	/**
+	 * Show loading indicator while creating user
+	 */
+	if (creatingUser) {
+		return (
+			// Fill entire screen and center elements
+			<View
+				style={{ ...FLEX1, justifyContent: 'center', alignItems: 'center' }}>
+				{/* Box with green border */}
+				<View
+					style={{
+						padding: 2,
+						borderStyle: 'round',
+						borderColor: 'green',
+						flexDirection: 'row',
+						gap: 2,
+					}}>
+					{/* Description text with a loading indicator */}
+					<Text>Creating user</Text>
+					<Spinner type="dots12" />
+				</View>
+			</View>
+		);
+	}
 
 	return (
 		<View style={FLEX1}>
