@@ -86,6 +86,11 @@ export type RequestMap = {
   rechargeList: {
     userId: number;
   };
+  payment: {
+    userId: number;
+    chargeId: number;
+    hasPaid: boolean;
+  };
 };
 
 export type Request =
@@ -122,6 +127,20 @@ export type Request =
         stationId: number;
         userId: number;
         battery_level: number;
+      };
+    }
+    | {
+      type: 'rechargeList';
+      data: {
+        userId: number;
+      };
+    }
+    | {
+      type: 'payment';
+      data: {
+        userId: number;
+        chargeId: number;
+        hasPaid: boolean;
       };
     };
     

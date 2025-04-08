@@ -144,6 +144,14 @@ export const connectionSchema = z.discriminatedUnion('type', [
       userId: z.number(),
     }),
   }),
+  z.object({
+    type: z.literal('payment'),
+    data: z.object({
+      userId: z.number(),
+      chargeId: z.number(),
+      hasPaid: z.boolean(),
+    }),
+  }),
 ]);
 
 const log = Logger.extend('Server');
