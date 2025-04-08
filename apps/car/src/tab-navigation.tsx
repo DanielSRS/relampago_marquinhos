@@ -30,10 +30,7 @@ export function TabNavigation() {
 				onChange={handleTabChange}
 				defaultValue="foo"
 				keyMap={{
-					next: ['j'],
-					previous: ['f'],
 					useTab: false,
-					useNumbers: false,
 				}}>
 				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
