@@ -78,8 +78,12 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 				<SelectInput
 					items={[
 						{
-							label: 'Criar usuário',
+							label: 'Criar usuário com id: ' + id,
 							value: 'reserve',
+						},
+						{
+							label: 'Cancelar',
+							value: 'cancel',
 						},
 						tcpErrorMsg
 							? {
@@ -91,6 +95,10 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 					onSelect={item => {
 						if (item.value === 'reserve') {
 							createUser();
+						}
+						if (item.value === 'cancel') {
+							setIdFiled('');
+							setId(undefined);
 						}
 					}}
 				/>
