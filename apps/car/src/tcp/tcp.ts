@@ -3,10 +3,16 @@ import { Logger } from '../utils/utils.js';
 
 type TCTRes =
 	| {
+			/**
+			 * Connexão tcp feita com sucesso
+			 */
 			type: 'success';
 			data: object;
 	  }
 	| {
+			/**
+			 * Houve falha na conexão tcp
+			 */
 			type: 'error';
 			message: string;
 			error: unknown;
@@ -46,7 +52,7 @@ export const tcpRequest = (data: object, host: string, port: number) => {
 		client.on('error', err => {
 			resolve({
 				type: 'error',
-				message: 'Invalid data received',
+				message: 'An error happened',
 				error: err,
 			});
 			log.error(`Error: `, err);
