@@ -871,4 +871,310 @@ export function setupBestAvailableMouseMode(
   return setupMouseEventsWithMode(input, output, bestMode);
 }
 
-// END NEEDS REVISION
+/**
+ * Interface for terminal capability detection results
+ */
+export interface TerminalCapabilities {
+  mouseSupported: boolean;
+  buttonModeSupported: boolean;
+  motionModeSupported: boolean;
+  anyModeSupported: boolean;
+  sgrEncoding: boolean;
+  urxvtEncoding: boolean;
+  utf8Encoding: boolean;
+}
+
+/**
+ * Terminal detection response timeout in milliseconds
+ * Increased from 1000ms to 2000ms to give terminals more time to respond
+ */
+const TERMINAL_DETECTION_TIMEOUT = 2000;
+
+/**
+ * Send a Device Attributes Request to the terminal and wait for response
+ * with improved debugging and fallback support
+ */
+export function DELETE_ME_sendTerminalRequest(
+  output: NodeJS.WritableStream,
+  input: NodeJS.ReadableStream,
+  request: string,
+  expectedPattern: RegExp,
+): Promise<RegExpExecArray | null> {
+  return new Promise(resolve => {
+    let responseBuffer = '';
+    let receivedAnyData = false;
+
+    // Handler to collect data from the terminal
+    const dataHandler = (data: Buffer | string) => {
+      receivedAnyData = true;
+      const str = typeof data === 'string' ? data : data.toString('utf8');
+      responseBuffer += str;
+
+      Logger.debug(`Received terminal response: ${JSON.stringify(str)}`);
+
+      // Check if we have a match
+      const match = expectedPattern.exec(responseBuffer);
+      if (match) {
+        Logger.debug(`Found match: ${JSON.stringify(match)}`);
+        cleanup();
+        resolve(match);
+      }
+    };
+
+    // Set up timeout handler
+    const timeout = setTimeout(() => {
+      if (responseBuffer) {
+        Logger.debug(
+          `Timeout with partial response: ${JSON.stringify(responseBuffer)}`,
+        );
+      } else if (receivedAnyData) {
+        Logger.debug('Timeout with data received but no match found');
+      } else {
+        Logger.debug('Timeout with no data received');
+      }
+      cleanup();
+      resolve(null); // Timeout - no match found
+    }, TERMINAL_DETECTION_TIMEOUT);
+
+    // Clean up function
+    const cleanup = () => {
+      clearTimeout(timeout);
+      input.removeListener('data', dataHandler);
+    };
+
+    // Set up listener and send the request
+    input.on('data', dataHandler);
+    Logger.debug(`Sending terminal request: ${JSON.stringify(request)}`);
+    output.write(request);
+  });
+}
+
+/**
+ * Fallback detection that attempts to enable a mouse mode and wait for user interaction
+ * More reliable but requires user action
+ */
+export function testMouseModeWithFallback(
+  output: NodeJS.WritableStream,
+  input: MouseAwareStream,
+  mode: MouseMode,
+): Promise<boolean> {
+  return new Promise(resolve => {
+    const timeout = setTimeout(() => {
+      cleanup();
+      resolve(false);
+    }, 100); // Very short timeout - just to set up the handler
+
+    // Enable the mode immediately
+    enableMouseMode(output, mode);
+
+    // Set up a one-shot event handler
+    const mouseHandler = () => {
+      Logger.debug(`Mouse mode ${mode} is working!`);
+      cleanup();
+      resolve(true);
+    };
+
+    input.once('mousepress', mouseHandler);
+
+    const cleanup = () => {
+      clearTimeout(timeout);
+      input.removeListener('mousepress', mouseHandler);
+      disableMouseMode(output, mode);
+    };
+  });
+}
+
+/**
+ * Detect mouse capabilities with both query and fallback methods
+ */
+export async function detectTerminalMouseCapabilities(
+  output: NodeJS.WritableStream,
+  input: NodeJS.ReadableStream,
+): Promise<TerminalCapabilities> {
+  const mouseInput = input as MouseAwareStream;
+  const capabilities: TerminalCapabilities = {
+    mouseSupported: false,
+    buttonModeSupported: false,
+    motionModeSupported: false,
+    anyModeSupported: false,
+    sgrEncoding: false,
+    urxvtEncoding: false,
+    utf8Encoding: false,
+  };
+
+  Logger.debug('Starting terminal mouse capability detection');
+
+  // First try to detect by environment
+  if (isMouseSupported()) {
+    Logger.debug('Mouse support detected via TERM environment variable');
+    capabilities.mouseSupported = true;
+    capabilities.buttonModeSupported = true;
+    capabilities.motionModeSupported = isMotionModeSupported();
+    capabilities.anyModeSupported = isAnyModeSupported();
+
+    // Try direct testing for SGR encoding
+    try {
+      // Set up silent parser just for detection
+      const detectData = (data: Buffer | string) => {
+        if (typeof data === 'string' && data.includes('\x1b[<')) {
+          capabilities.sgrEncoding = true;
+        } else if (Buffer.isBuffer(data)) {
+          const str = data.toString('utf8');
+          if (str.includes('\x1b[<')) {
+            capabilities.sgrEncoding = true;
+          }
+        }
+      };
+
+      // Try to enable SGR encoding briefly
+      mouseInput.on('data', detectData);
+      enableMouseEncoding(output, MouseEncoding.SGR);
+
+      // Wait a bit then disable
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      mouseInput.removeListener('data', detectData);
+      disableMouseEncoding(output, MouseEncoding.SGR);
+    } catch (err) {
+      Logger.debug('Error during SGR encoding detection:', err);
+    }
+
+    // For URXVT and UTF8, trust the TERM variable
+    capabilities.urxvtEncoding =
+      capabilities.mouseSupported &&
+      (process.env['TERM']?.includes('rxvt') ?? false);
+    capabilities.utf8Encoding = capabilities.mouseSupported;
+
+    return capabilities;
+  }
+
+  // Try manual tests if environment check failed
+  try {
+    Logger.debug('Testing mouse button mode');
+    capabilities.buttonModeSupported = await testMouseModeWithFallback(
+      output,
+      mouseInput,
+      MouseMode.BUTTON,
+    );
+    capabilities.mouseSupported = capabilities.buttonModeSupported;
+
+    if (capabilities.mouseSupported) {
+      Logger.debug('Testing mouse motion mode');
+      capabilities.motionModeSupported = await testMouseModeWithFallback(
+        output,
+        mouseInput,
+        MouseMode.MOTION,
+      );
+
+      Logger.debug('Testing mouse any mode');
+      capabilities.anyModeSupported = await testMouseModeWithFallback(
+        output,
+        mouseInput,
+        MouseMode.ANY,
+      );
+
+      // For encodings, assume modern terminals support SGR
+      capabilities.sgrEncoding = true;
+      capabilities.utf8Encoding = true;
+
+      // Only some terminals support URXVT
+      capabilities.urxvtEncoding =
+        process.env['TERM']?.includes('rxvt') || false;
+    }
+  } catch (err) {
+    Logger.debug('Error during mouse capability detection:', err);
+  }
+
+  // Reliable fallback for modern terminals
+  if (
+    !capabilities.mouseSupported &&
+    (process.env['TERM']?.includes('xterm') ||
+      process.env['TERM']?.includes('screen') ||
+      process.env['TERM']?.includes('tmux'))
+  ) {
+    Logger.debug('Falling back to known terminal capabilities');
+    capabilities.mouseSupported = true;
+    capabilities.buttonModeSupported = true;
+    capabilities.motionModeSupported = true;
+    capabilities.anyModeSupported = true;
+    capabilities.sgrEncoding = true;
+    capabilities.utf8Encoding = true;
+  }
+
+  Logger.debug('Detected capabilities:', capabilities);
+  return capabilities;
+}
+
+/**
+ * Setup optimal mouse support with improved reliability
+ */
+export async function setupOptimalMouseSupport(
+  input: MouseAwareStream,
+  output: NodeJS.WritableStream,
+): Promise<(() => void) | undefined> {
+  Logger.debug('Setting up optimal mouse support');
+
+  // Actually detect terminal capabilities
+  const capabilities = await detectTerminalMouseCapabilities(output, input);
+
+  // Check if mouse is supported at all
+  if (!capabilities.mouseSupported) {
+    Logger.debug('Mouse support not detected in this terminal');
+    return undefined;
+  }
+
+  // Determine best mode based on detected capabilities
+  let mode: MouseMode | undefined;
+  if (capabilities.anyModeSupported) {
+    mode = MouseMode.ANY;
+    Logger.debug('Using ANY mouse mode (hover support)');
+  } else if (capabilities.motionModeSupported) {
+    mode = MouseMode.MOTION;
+    Logger.debug('Using MOTION mouse mode (drag support)');
+  } else if (capabilities.buttonModeSupported) {
+    mode = MouseMode.BUTTON;
+    Logger.debug('Using BUTTON mouse mode (click support only)');
+  } else {
+    Logger.debug('No supported mouse mode detected');
+    return undefined;
+  }
+
+  // Use the best available encoding
+  if (capabilities.sgrEncoding) {
+    Logger.debug('Enabling SGR mouse encoding (extended coordinates)');
+    enableMouseEncoding(output, MouseEncoding.SGR);
+  } else if (capabilities.urxvtEncoding) {
+    Logger.debug('Enabling URXVT mouse encoding');
+    enableMouseEncoding(output, MouseEncoding.URXVT);
+  } else if (capabilities.utf8Encoding) {
+    Logger.debug('Enabling UTF8 mouse encoding');
+    enableMouseEncoding(output, MouseEncoding.UTF8);
+  }
+
+  // Enable the chosen mode
+  Logger.debug(`Enabling mouse mode: ${mode}`);
+  enableMouseMode(output, mode);
+
+  // Set up handler for mouse events
+  const onData = (data: Buffer | string): void => {
+    parseMouseEvents(input, data);
+  };
+
+  input.on('data', onData);
+
+  // Return cleanup function that disables all enabled features
+  return function cleanup(): void {
+    input.removeListener('data', onData);
+    disableMouseMode(output, mode!);
+
+    if (capabilities.sgrEncoding) {
+      disableMouseEncoding(output, MouseEncoding.SGR);
+    }
+    if (capabilities.urxvtEncoding) {
+      disableMouseEncoding(output, MouseEncoding.URXVT);
+    }
+    if (capabilities.utf8Encoding) {
+      disableMouseEncoding(output, MouseEncoding.UTF8);
+    }
+  };
+}
