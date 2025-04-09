@@ -9,6 +9,7 @@ import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { Charging } from './Pages/Charging/Charging.js';
 import { Charges } from './Pages/Charges/Charges.js';
 import { View } from '../../shared/index.js';
+import { About } from './Pages/about/about.js';
 
 export function TabNavigation() {
 	const [activeTabName, setActiveTabName] = useState<string>('foo');
@@ -35,6 +36,7 @@ export function TabNavigation() {
 				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
 				<Tab name="baz">Baz</Tab>
+				<Tab name="about">About</Tab>
 			</Tabs>
 			<TabContent activeTab={activeTabName} />
 		</View>
@@ -84,7 +86,9 @@ function TabContent(props: { activeTab: string }) {
 				</Computed>
 			);
 			break;
-
+		case 'about':
+			return <About />;
+			break;
 		default:
 			return (
 				<View style={{ ...FLEX1, backgroundColor: 'magenta' }}>

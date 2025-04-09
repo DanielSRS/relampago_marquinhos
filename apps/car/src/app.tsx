@@ -28,7 +28,7 @@ export default function App() {
 							y: getRandomNumber(0, 200),
 						},
 					});
-					SharedData.battery_level.set( getRandomNumber(20, 95),);
+					SharedData.battery_level.set(getRandomNumber(20, 95));
 				}}
 			/>
 		);
