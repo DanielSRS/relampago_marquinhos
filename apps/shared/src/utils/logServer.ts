@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import * as http from 'node:http';
-import { consoleTransport } from 'react-native-logs';
+import { consoleTransport, logger } from 'react-native-logs';
 import { LOG_PATH, LOG_SERVER_HOST, LOG_SERVER_PORT } from '../contants.js';
+
+const log = logger.createLogger().extend('LogerServer');
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === LOG_PATH) {
@@ -34,11 +36,14 @@ const server = http.createServer((req, res) => {
       u: req.url,
       s: 404,
     });
+    log.error('unknown request', {
+      req,
+    });
     res.setHeader('Content-Type', 'text/plain');
     res.end('Not Found\n');
   }
 });
 
 server.listen(LOG_SERVER_PORT, LOG_SERVER_HOST, () => {
-  console.log(`Server running at ${LOG_SERVER_HOST}:${LOG_SERVER_PORT}/`);
+  log.info(`Server running at ${LOG_SERVER_HOST}:${LOG_SERVER_PORT}/`);
 });

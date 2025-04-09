@@ -6605,6 +6605,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shared@workspace:apps/shared":
+  version: 0.0.0-use.local
+  resolution: "shared@workspace:apps/shared"
+  languageName: unknown
+  linkType: soft
+
 "shebang-command@npm:^2.0.0":
   version: 2.0.0
   resolution: "shebang-command@npm:2.0.0"
