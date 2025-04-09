@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
-import { setupMouseEvents } from '../../utils/mouse-events.js';
+import {
+  MouseMode,
+  setupExtendedMouseEvents,
+} from '../../utils/mouse-events.js';
 
 const ENABLED = true;
 
@@ -29,10 +32,14 @@ export const Screen = (props: ScreenProps) => {
   }, []);
 
   useEffect(() => {
-    const disableMouse = setupMouseEvents(process.stdin, process.stdout);
+    const disableMouse = setupExtendedMouseEvents(
+      process.stdin,
+      process.stdout,
+      MouseMode.BUTTON,
+    );
     return () => {
       leaveAltScreen();
-      disableMouse();
+      disableMouse?.();
     };
   }, []);
 
