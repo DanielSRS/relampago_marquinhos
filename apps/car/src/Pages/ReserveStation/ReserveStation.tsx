@@ -3,9 +3,9 @@ import { Text, useInput } from 'ink';
 import type {
 	Station,
 	Request,
-	User,
 	Charge,
 	Response,
+	Car,
 } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
 import { tcpRequest, View } from '../../../../shared/index.js';
@@ -15,19 +15,14 @@ import { Logger } from '../../../../shared/index.js';
 import { SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import type { TCPResponse } from '../../../../shared/index.js';
 
-const carLocation = {
-	x: 10,
-	y: 10,
-};
-
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
 export function ReserveStation(props: {
 	station: Station;
-	user: User;
+	car: Car;
 	onGoBack: () => void;
 }) {
-	const { station, onGoBack, user } = props;
+	const { station, onGoBack, car } = props;
 	const [response, setResponse] = useState<TCPResponse>();
 	const isAvaliable = station.state === 'avaliable';
 
@@ -47,7 +42,7 @@ export function ReserveStation(props: {
 				type: 'startCharging',
 				data: {
 					stationId: station.id,
-					userId: user.id,
+					userId: car.id,
 					battery_level: SharedData.battery_level.peek() ?? 50,
 				},
 			} satisfies Request,
@@ -75,7 +70,7 @@ export function ReserveStation(props: {
 				type: 'reserve',
 				data: {
 					stationId: station.id,
-					userId: user.id,
+					userId: car.id,
 				},
 			} satisfies Request,
 			SERVER_HOST,
@@ -112,7 +107,7 @@ export function ReserveStation(props: {
 				<Text>Fila: {station.reservations.length}</Text>
 				<Text>
 					Distância:{' '}
-					{calculateDistance(station.location, carLocation).toFixed(2)}u
+					{calculateDistance(station.location, car.location).toFixed(2)}u
 				</Text>
 				{/* <Text>Tipo: {station.type}</Text>
 						<Text>Preço: {station.price}</Text> */}
