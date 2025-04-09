@@ -138,6 +138,10 @@ export function disableMouse(stream: NodeJS.WritableStream): void {
 
 /**
  * Parses mouse events from input stream and emits them as 'mousepress' events.
+ * Supports multiple mouse protocols:
+ * - X11 Mouse Protocol: \x1b[M followed by three bytes
+ * - SGR Mouse Protocol: \x1b[<num;num;numM or \x1b[<num;num;numm
+ * - URXVT Mouse Protocol: \x1b[num;num;numM
  *
  * @param stream readable stream instance
  * @param input input data to parse
@@ -151,27 +155,23 @@ export function parseMouseEvents(
     input = input.toString(stream.encoding || 'utf-8');
   }
 
-  // Check if this is a mouse sequence (ESC [ M)
-  if (input.length >= 3 && input.substring(0, 3) === '\x1b[M') {
-    const key: MouseEvent = {
-      name: 'mouse',
-      sequence: input,
-      x: 0,
-      y: 0,
-      scroll: 0,
-      ctrl: false,
-      meta: false,
-      shift: false,
-      release: false,
-      isMotion: false,
-      isHover: false,
-    };
+  // Initialize a MouseEvent object with default values
+  const key: MouseEvent = {
+    name: 'mouse',
+    sequence: input,
+    x: 0,
+    y: 0,
+    scroll: 0,
+    ctrl: false,
+    meta: false,
+    shift: false,
+    release: false,
+    isMotion: false,
+    isHover: false,
+  };
 
-    if (input.length < 6) {
-      // Incomplete mouse event sequence
-      return false;
-    }
-
+  // Check for X11 mouse protocol: ESC [ M <three bytes>
+  if (input.length >= 6 && input.substring(0, 3) === '\x1b[M') {
     const b = input.charCodeAt(3);
     key.x = input.charCodeAt(4) - 0o40;
     key.y = input.charCodeAt(5) - 0o40;
@@ -217,7 +217,83 @@ export function parseMouseEvents(
     return true;
   }
 
-  // Not a mouse event, return quietly without logging
+  // Check for SGR mouse protocol: ESC [ < num ; num ; num M or ESC [ < num ; num ; num m
+  // Format: \x1b[<button;x;yM (press) or \x1b[<button;x;ym (release)
+  // eslint-disable-next-line no-control-regex
+  const sgrMatch = input.match(/^\x1b\[<(\d+);(\d+);(\d+)([Mm])/);
+  if (sgrMatch) {
+    const [, buttonStr, xStr, yStr, eventType] = sgrMatch;
+    const buttonCode = parseInt(buttonStr!, 10);
+    key.x = parseInt(xStr!, 10) - 1; // SGR reports 1-based coordinates
+    key.y = parseInt(yStr!, 10) - 1;
+
+    // Release is indicated by 'm' at the end
+    key.release = eventType === 'm';
+
+    // Button and modifier parsing for SGR
+    key.button = buttonCode & 3; // Bottom 2 bits are the button number
+    key.shift = !!((buttonCode >> 2) & 1);
+    key.meta = !!((buttonCode >> 3) & 1);
+    key.ctrl = !!((buttonCode >> 4) & 1);
+
+    // Motion flag (bit 5)
+    key.isMotion = !!((buttonCode >> 5) & 1);
+
+    // Scroll wheel (bits 6-7)
+    if ((buttonCode >> 6) & 1) {
+      key.scroll = buttonCode & 1 ? 1 : -1;
+    }
+
+    // Hover detection
+    key.isHover = key.isMotion && (key.button === 3 || buttonCode === 35);
+
+    // Button number handling
+    if (key.scroll !== 0 || key.release || key.isHover) {
+      key.button = undefined;
+    }
+
+    stream.emit('mousepress', key);
+    MostRecentMouseEventEmitedTime = Date.now();
+    return true;
+  }
+
+  // Check for URXVT mouse protocol: ESC [ num ; num ; num M
+  // eslint-disable-next-line no-control-regex
+  const urxvtMatch = input.match(/^\x1b\[(\d+);(\d+);(\d+)M/);
+  if (urxvtMatch) {
+    const [, buttonStr, xStr, yStr] = urxvtMatch;
+    const buttonCode = parseInt(buttonStr!, 10);
+    key.x = parseInt(xStr!, 10) - 1; // URXVT also uses 1-based coordinates
+    key.y = parseInt(yStr!, 10) - 1;
+
+    // In URXVT, release is button code 3
+    key.release = buttonCode === 3;
+
+    // Modifier keys not directly supported in URXVT protocol
+    // but can be determined from button code ranges
+    key.button = buttonCode & 3;
+    key.shift = buttonCode >= 4 && buttonCode <= 7;
+    key.meta = buttonCode >= 8 && buttonCode <= 15;
+    key.ctrl = buttonCode >= 16;
+
+    // Motion detection in URXVT is less clear, often indicated by specific button ranges
+    key.isMotion = buttonCode >= 32 && buttonCode <= 63;
+
+    // No direct hover support in URXVT
+    key.isHover = false;
+
+    // Scroll wheel is typically codes 64-67
+    if (buttonCode >= 64 && buttonCode <= 67) {
+      key.scroll = buttonCode === 64 || buttonCode === 65 ? -1 : 1;
+      key.button = undefined;
+    }
+
+    stream.emit('mousepress', key);
+    MostRecentMouseEventEmitedTime = Date.now();
+    return true;
+  }
+
+  // Not a recognized mouse event
   return false;
 }
 
