@@ -9,10 +9,10 @@ import type {
 	Response,
 } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
-import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
+import { tcpRequest, type TCPResponse } from '../../../../shared/index.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
-import { Logger } from '../../utils/utils.js';
+import { Logger } from '../../../../shared/index.js';
 
 const carLocation = {
 	x: 10,

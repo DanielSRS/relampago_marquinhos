@@ -3,7 +3,7 @@ import { Text } from 'ink';
 import { View } from '../../components/View/View.js';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
-import { tcpRequest } from '../../tcp/tcp.js';
+import { tcpRequest } from '../../../../shared/index.js';
 import Spinner from 'ink-spinner';
 import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import type { Request, User, Response } from '../../../../../src/main.types.js';

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Text } from 'ink';
-import { Logger } from '../../../utils/utils.js';
+import { Logger } from '../../../../../shared/index.js';
 import { Suggestion } from './suggestion.js';
 import { ScrollView } from '../../../components/ScrollView/ScrollView.js';
 import { calculateDistance } from '../../../../../../src/location.js';

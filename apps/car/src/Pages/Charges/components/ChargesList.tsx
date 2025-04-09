@@ -6,7 +6,7 @@ import {
 } from '../../../components/ScrollView/ScrollView.js';
 import { Text } from 'ink';
 import React from 'react';
-import { Logger } from '../../../utils/utils.js';
+import { Logger } from '../../../../../shared/index.js';
 import { ChargeItem } from './ChargeItem.js';
 
 interface ChargesListProps {

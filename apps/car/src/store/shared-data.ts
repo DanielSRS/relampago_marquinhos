@@ -7,8 +7,8 @@ import type {
 	Charge,
 } from '../../../../src/main.types.js';
 import { SERVER_HOST, SERVER_PORT } from '../constants.js';
-import { tcpRequest } from '../tcp/tcp.js';
-import { Logger } from '../utils/utils.js';
+import { tcpRequest } from '../../../shared/index.js';
+import { Logger } from '../../../shared/index.js';
 
 export const SharedData = observable<{
 	car: Car;
