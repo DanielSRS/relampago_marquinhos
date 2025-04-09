@@ -12,15 +12,13 @@ import { tcpRequest, View } from '../../../../shared/index.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
 import { Logger } from '../../../../shared/index.js';
+import { SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import type { TCPResponse } from '../../../../shared/index.js';
 
 const carLocation = {
 	x: 10,
 	y: 10,
 };
-
-const SERVER_HOST = 'localhost'; //server IP
-const SERVER_PORT = 8080; // server port
 
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
