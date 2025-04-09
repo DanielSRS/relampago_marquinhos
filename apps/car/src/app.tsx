@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppRegistry } from './appRegistry.js';
+import { AppRegistry } from '../../shared/index.js';
 import { useApp, useInput } from 'ink';
 import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
 import { SharedData } from './store/shared-data.js';

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Text, useInput } from 'ink';
-import { View } from '../../components/View/View.js';
 import type {
 	Station,
 	Request,
@@ -9,10 +8,11 @@ import type {
 	Response,
 } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
-import { tcpRequest, type TCPResponse } from '../../../../shared/index.js';
+import { tcpRequest, View } from '../../../../shared/index.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
 import { Logger } from '../../../../shared/index.js';
+import type { TCPResponse } from '../../../../shared/index.js';
 
 const carLocation = {
 	x: 10,

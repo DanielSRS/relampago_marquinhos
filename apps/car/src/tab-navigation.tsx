@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Text } from 'ink';
 import { Tabs, Tab } from 'ink-tab';
-import { View } from './components/View/View.js';
 import { FLEX1 } from './constants.js';
 import { Recomendations } from './Pages/Recomendations/Recomendations.js';
 import { Computed } from '@legendapp/state/react';
@@ -9,6 +8,7 @@ import { SharedData } from './store/shared-data.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { Charging } from './Pages/Charging/Charging.js';
 import { Charges } from './Pages/Charges/Charges.js';
+import { View } from '../../shared/index.js';
 
 export function TabNavigation() {
 	const [activeTabName, setActiveTabName] = useState<string>('foo');

@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, type ViewStyles } from '../../components/View/View.js';
 import { Text, useInput } from 'ink';
 import type { Station, Position } from '../../../../../src/main.types.js';
 // import { Logger } from '../../utils/utils.js';
@@ -7,6 +6,8 @@ import { FLEX1 } from '../../constants.js';
 import { SuggestionsList } from './components/suggestions-list.js';
 import { Computed, use$ } from '@legendapp/state/react';
 import { getSuggestions, SharedData } from '../../store/shared-data.js';
+import { View } from '../../../../shared/index.js';
+import type { ViewStyles } from '../../../../shared/index.js';
 
 // const log = Logger.extend('Recomendations');
 
