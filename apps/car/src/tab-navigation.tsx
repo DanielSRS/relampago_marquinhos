@@ -61,7 +61,7 @@ function TabContent(props: { activeTab: string }) {
 								<ReserveStation
 									station={selectedStation}
 									onGoBack={() => SharedData.selectedStation.set(undefined)}
-									user={car}
+									car={car}
 								/>
 							);
 						}
