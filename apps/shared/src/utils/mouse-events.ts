@@ -68,6 +68,31 @@ export enum MouseMode {
 }
 
 /**
+ * Mouse encoding modes
+ */
+export enum MouseEncoding {
+  /**
+   * Default X11 encoding (limited to coordinates < 223)
+   */
+  DEFAULT = 0,
+
+  /**
+   * UTF8 mouse encoding (works with non-ASCII characters)
+   */
+  UTF8 = 1005,
+
+  /**
+   * SGR mouse encoding (supports coordinates > 223)
+   */
+  SGR = 1006,
+
+  /**
+   * URXVT mouse encoding (alternate extended encoding)
+   */
+  URXVT = 1015,
+}
+
+/**
  * Enables specific mouse event tracking mode on the output stream.
  *
  * @param stream writable stream instance
@@ -91,6 +116,36 @@ export function disableMouseMode(
   mode: MouseMode,
 ): void {
   stream.write(`\x1b[?${mode}l`);
+}
+
+/**
+ * Enables specific mouse encoding mode on the output stream.
+ *
+ * @param stream writable stream instance
+ * @param mode encoding mode to enable
+ */
+export function enableMouseEncoding(
+  stream: NodeJS.WritableStream,
+  mode: MouseEncoding,
+): void {
+  if (mode !== MouseEncoding.DEFAULT) {
+    stream.write(`\x1b[?${mode}h`);
+  }
+}
+
+/**
+ * Disables specific mouse encoding mode on the output stream.
+ *
+ * @param stream writable stream instance
+ * @param mode encoding mode to disable
+ */
+export function disableMouseEncoding(
+  stream: NodeJS.WritableStream,
+  mode: MouseEncoding,
+): void {
+  if (mode !== MouseEncoding.DEFAULT) {
+    stream.write(`\x1b[?${mode}l`);
+  }
 }
 
 /**
@@ -120,6 +175,41 @@ export function enableMouseMotion(stream: NodeJS.WritableStream): void {
  */
 export function enableMouseAny(stream: NodeJS.WritableStream): void {
   enableMouseMode(stream, MouseMode.ANY);
+}
+
+/**
+ * Enable all mouse modes with extended encoding
+ *
+ * This sets up full mouse tracking with SGR encoding, which:
+ * 1. Allows for coordinates beyond the 223 limit of the default encoding
+ * 2. Properly reports mouse release events
+ * 3. Works with larger terminal screens
+ *
+ * @param stream writable stream instance
+ */
+export function enableFullMouseSupport(stream: NodeJS.WritableStream): void {
+  // First enable SGR encoding mode (best extended mode)
+  enableMouseEncoding(stream, MouseEncoding.SGR);
+
+  // Then enable all mouse events (movement, hover, etc)
+  enableMouseMode(stream, MouseMode.ANY);
+}
+
+/**
+ * Disable all mouse modes and encodings
+ *
+ * @param stream writable stream instance
+ */
+export function disableFullMouseSupport(stream: NodeJS.WritableStream): void {
+  // Disable all tracking modes
+  disableMouseMode(stream, MouseMode.BUTTON);
+  disableMouseMode(stream, MouseMode.MOTION);
+  disableMouseMode(stream, MouseMode.ANY);
+
+  // Disable all encoding modes
+  disableMouseEncoding(stream, MouseEncoding.UTF8);
+  disableMouseEncoding(stream, MouseEncoding.SGR);
+  disableMouseEncoding(stream, MouseEncoding.URXVT);
 }
 
 /**
@@ -293,7 +383,6 @@ export function parseMouseEvents(
     return true;
   }
 
-  // Not a recognized mouse event
   return false;
 }
 
@@ -438,6 +527,40 @@ export function setupMouseEventsWithMode(
 }
 
 /**
+ * Sets up enhanced mouse event handling with SGR encoding for extended coordinates
+ *
+ * @param input readable stream to receive mouse events
+ * @param output writable stream to enable mouse events on
+ * @param mode mouse tracking mode to enable
+ * @returns a cleanup function that disables mouse events and removes listeners
+ */
+export function setupExtendedMouseEvents(
+  input: MouseAwareStream,
+  output: NodeJS.WritableStream,
+  mode: MouseMode = MouseMode.ANY,
+): () => void {
+  // Enable SGR encoding for extended coordinates
+  enableMouseEncoding(output, MouseEncoding.SGR);
+
+  // Enable specified mouse tracking mode
+  enableMouseMode(output, mode);
+
+  // Set up handler for data events on input
+  const onData = (data: Buffer | string): void => {
+    parseMouseEvents(input, data);
+  };
+
+  input.on('data', onData);
+
+  // Return a cleanup function
+  return function cleanup(): void {
+    input.removeListener('data', onData);
+    disableMouseMode(output, mode);
+    disableMouseEncoding(output, MouseEncoding.SGR);
+  };
+}
+
+/**
  * Sets up mouse event handling on a stream.
  *
  * @param input readable stream to receive mouse events
@@ -456,6 +579,26 @@ export function setupAnyMouseEvents(
   output: NodeJS.WritableStream,
 ): () => void {
   return setupMouseEventsWithMode(input, output, MouseMode.ANY);
+}
+
+/**
+ * Sets up the best available mouse support with proper extended encoding
+ *
+ * @param input readable stream to receive mouse events
+ * @param output writable stream to enable mouse events on
+ * @returns a cleanup function or undefined if mouse support isn't available
+ */
+export function setupBestMouseSupport(
+  input: MouseAwareStream,
+  output: NodeJS.WritableStream,
+): (() => void) | undefined {
+  const bestMode = detectBestSupportedMouseMode();
+
+  if (bestMode === undefined) {
+    return undefined;
+  }
+
+  return setupExtendedMouseEvents(input, output, bestMode);
 }
 
 // Example usage:
