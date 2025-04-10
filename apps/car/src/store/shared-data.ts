@@ -23,7 +23,6 @@ export const SharedData = observable<{
 	// getSuggestions: () => void;
 	suggestions: Station[];
 	reservedStation: Station;
-	battery_level: number;
 	chargingCar: Charge;
 	charges: Charge[];
 }>();

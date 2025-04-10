@@ -19,7 +19,7 @@ interface ChargingProps {
 export function Charging(props: ChargingProps) {
 	const {} = props;
 	const charge = use$(SharedData.chargingCar);
-	const batteryLevel = use$(SharedData.battery_level) ?? -1;
+	const batteryLevel = use$(SharedData.car)?.batteryLevel ?? -1;
 
 	if (!charge) {
 		return <View />;

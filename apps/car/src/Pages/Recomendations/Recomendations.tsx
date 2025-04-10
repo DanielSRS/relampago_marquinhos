@@ -68,14 +68,14 @@ export function Recomendations(props: RecomendationsProps) {
 						<Computed>
 							{() => {
 								const pos = SharedData.car.location.get();
-								const x = pos?.x ?? -1
-								const y = pos?.y ?? -1
+								const x = pos?.x ?? -1;
+								const y = pos?.y ?? -1;
 								return (
 									<>
-									<Text>x: {x}</Text>
-									<Text>y: {y}</Text>
+										<Text>x: {x}</Text>
+										<Text>y: {y}</Text>
 									</>
-								)
+								);
 							}}
 						</Computed>
 					</View>
@@ -86,7 +86,7 @@ export function Recomendations(props: RecomendationsProps) {
 							<Text>Nível da bateria</Text>
 						</View>
 						<Computed>
-							{() => <Text>{SharedData.battery_level.get()}%</Text>}
+							{() => <Text>{SharedData.car.batteryLevel.get()}%</Text>}
 						</Computed>
 					</View>
 				</View>

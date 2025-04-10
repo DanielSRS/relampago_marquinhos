@@ -45,7 +45,7 @@ export function ReserveStation(props: {
 			data: {
 				stationId: station.id,
 				userId: car.id,
-				battery_level: SharedData.battery_level.peek() ?? 50,
+				battery_level: SharedData.car.batteryLevel.peek() ?? 50,
 			},
 		});
 		if (res.type === 'success') {
