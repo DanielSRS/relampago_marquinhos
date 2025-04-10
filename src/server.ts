@@ -4,7 +4,7 @@ import type {
   UserGroup,
   ChargeRecord,
 } from './main.types.ts';
-import { curry, Logger } from './utils.ts';
+import { Logger } from './utils.ts';
 import * as net from 'node:net';
 import { createRouter } from './server/router.ts';
 import { getSuggestions } from './server/routes/stationSuggetions.ts';
@@ -15,72 +15,11 @@ import { endCharging } from './server/routes/endCharging.ts';
 import { rechargeList } from './server/routes/rechargeList.ts';
 import { payment } from './server/routes/payment.ts';
 import { connectionSchema } from './schemas/connection.ts';
+import { reserve } from './server/routes/reserve.ts';
 
 const HOST = '0.0.0.0';
 const PORT = 8080;
 const MAX_RADIUS = 8000;
-
-const addReservation = curry(
-  (
-    stations: StationGroup,
-    users: UserGroup,
-    idStation: number,
-    idUser: number,
-  ): {
-    success: boolean;
-    message: string;
-  } => {
-    const station = stations[idStation];
-
-    if (!station) {
-      // retutn error
-      return {
-        success: false,
-        message: 'station does not exist',
-      };
-    }
-
-    const user = users[idUser];
-    if (!user) {
-      return {
-        message: 'User does not exist',
-        success: false,
-      };
-    }
-
-    // verificar se ja tem reserva
-    const hasReservationOnThisStation = station.reservations.includes(idUser);
-    if (hasReservationOnThisStation) {
-      return {
-        success: true,
-        message: `You already have a reservation on this station: ${station.id}`,
-      };
-    }
-
-    const hasAnyOtherReservation = Object.entries(stations).reduce(
-      (prev, station) => {
-        return station[1].reservations.includes(idUser) || prev;
-      },
-      false,
-    );
-
-    if (hasAnyOtherReservation) {
-      return {
-        success: false,
-        message: 'You already have a reservation on another station',
-      };
-    }
-
-    station.reservations.push(idUser);
-    station.state = 'reserved';
-
-    // retorna sucesso
-    return {
-      success: true,
-      message: `Reserved station ${station.id}`,
-    };
-  },
-);
 
 const STATIONS: StationGroup = {
   2: {
@@ -131,28 +70,7 @@ const server = net.createServer(socket => {
     }
 
     const router = createRouter()
-      .add('reserve', data => {
-        // Remover carro da lista de sugestões
-
-        const result = addReservation(
-          STATIONS,
-          USERS,
-          data.stationId,
-          data.userId,
-        );
-        if (result.success) {
-          return {
-            message: result.message,
-            success: true,
-            data: undefined,
-          };
-        }
-        return {
-          message: result.message,
-          success: false,
-          error: undefined,
-        };
-      })
+      .add('reserve', reserve(STATIONS, USERS))
       .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
       .add('registerStation', registerStation(STATIONS))
       .add('registerUser', registerUser(USERS))
