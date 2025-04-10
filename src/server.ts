@@ -1,4 +1,3 @@
-import type { StationGroup, UserGroup, ChargeRecord } from './main.types.ts';
 import { Logger } from './utils.ts';
 import * as net from 'node:net';
 import { createRouter } from './server/router.ts';
@@ -10,37 +9,11 @@ import { endCharging } from './server/routes/endCharging.ts';
 import { rechargeList } from './server/routes/rechargeList.ts';
 import { payment } from './server/routes/payment.ts';
 import { reserve } from './server/routes/reserve.ts';
+import { CHARGES, STATIONS, USERS } from './server/data/data.ts';
 
 const HOST = '0.0.0.0';
 const PORT = 8080;
 const MAX_RADIUS = 8000;
-
-const STATIONS: StationGroup = {
-  2: {
-    id: 2,
-    location: {
-      x: 200,
-      y: 50,
-    },
-    reservations: [],
-    state: 'avaliable',
-    suggestions: [],
-  },
-  12: {
-    id: 12,
-    location: {
-      x: 0,
-      y: 1,
-    },
-    reservations: [],
-    state: 'avaliable',
-    suggestions: [],
-  },
-};
-
-const USERS: UserGroup = {};
-
-const CHARGES: ChargeRecord = {};
 
 const log = Logger.extend('Server');
 const server = net.createServer(socket => {
