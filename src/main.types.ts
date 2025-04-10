@@ -9,6 +9,15 @@ export interface Car {
    * Localização do carro.
    */
   location: Position;
+  /**
+   * Nivel da bateria do carro. O valor deve ser entre 0 e 100.
+   * 0 significa que o carro está sem bateria e 100 significa
+   * que o carro está totalmente carregado.
+   * O valor deve ser um número inteiro.
+   * @example 75
+   * @example 100
+   */
+  batteryLevel: number;
 }
 /**
  * Representa a posição dentro do sistema de coordenadas.
@@ -300,5 +309,6 @@ export function Car(id: number, x: number, y: number): Car {
       x,
       y,
     },
+    batteryLevel: 0,
   };
 }
