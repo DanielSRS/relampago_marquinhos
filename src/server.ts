@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import type {
   ErrorResponse,
   StationGroup,
@@ -6,19 +5,16 @@ import type {
   ChargeRecord,
 } from './main.types.ts';
 import { curry, Logger } from './utils.ts';
-
 import * as net from 'node:net';
 import { createRouter } from './server/router.ts';
 import { getSuggestions } from './server/routes/stationSuggetions.ts';
 import { registerStation } from './server/routes/registerStation.ts';
-import { carSchema } from './schemas/carSchema.ts';
-import { stationSchema } from './schemas/stationSchema.ts';
 import { registerUser } from './server/routes/registerCar.ts';
-import { userSchema } from './schemas/userSchema.ts';
 import { startCharging } from './server/routes/startCharging.ts';
 import { endCharging } from './server/routes/endCharging.ts';
 import { rechargeList } from './server/routes/rechargeList.ts';
 import { payment } from './server/routes/payment.ts';
+import { connectionSchema } from './schemas/connection.ts';
 
 const HOST = '0.0.0.0';
 const PORT = 8080;
@@ -112,58 +108,6 @@ const STATIONS: StationGroup = {
 const USERS: UserGroup = {};
 
 const CHARGES: ChargeRecord = {};
-
-export const connectionSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('reserve'),
-    data: z.object({
-      userId: z.number(),
-      stationId: z.number(),
-    }),
-  }),
-  z.object({
-    type: z.literal('getSuggestions'),
-    data: carSchema,
-  }),
-  z.object({
-    type: z.literal('registerStation'),
-    data: stationSchema,
-  }),
-  z.object({
-    type: z.literal('registerUser'),
-    data: userSchema,
-  }),
-  z.object({
-    type: z.literal('startCharging'),
-    data: z.object({
-      stationId: z.number(),
-      userId: z.number(),
-      battery_level: z.number(),
-    }),
-  }),
-  z.object({
-    type: z.literal('endCharging'),
-    data: z.object({
-      stationId: z.number(),
-      userId: z.number(),
-      battery_level: z.number(),
-    }),
-  }),
-  z.object({
-    type: z.literal('rechargeList'),
-    data: z.object({
-      userId: z.number(),
-    }),
-  }),
-  z.object({
-    type: z.literal('payment'),
-    data: z.object({
-      userId: z.number(),
-      chargeId: z.number(),
-      hasPaid: z.boolean(),
-    }),
-  }),
-]);
 
 const log = Logger.extend('Server');
 const server = net.createServer(socket => {
