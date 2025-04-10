@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '../../error-codes.ts';
 import type {
   StationGroup,
   UserGroup,
@@ -41,7 +42,7 @@ export const startCharging = curry(
       return {
         message: 'User does not exist',
         success: false,
-        error: 'this field is not optional',
+        error: ERROR_CODES.USER_NOT_FOUND,
       };
     }
 

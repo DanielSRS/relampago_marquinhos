@@ -1,3 +1,5 @@
+import type { ErrorCode } from './error-codes.ts';
+
 export interface Car {
   /**
    * Id do carro. O id deve ser um número inteiro.
@@ -228,7 +230,7 @@ export type RequestResponseMap = {
      * A resposta pode ser uma resposta de sucesso ou uma
      * resposta de erro.
      */
-    output: Response<undefined> | ErrorResponse<undefined>;
+    output: Response<undefined> | ErrorResponse<undefined | ErrorCode>;
   };
   /**
    * Endpoint para obter a sugestão de estações para recarregar o carro.
@@ -310,7 +312,7 @@ export type RequestResponseMap = {
      * A resposta pode ser uma resposta de sucesso ou uma
      * resposta de erro.
      */
-    output: Response<Charge> | ErrorResponse<string>;
+    output: Response<Charge> | ErrorResponse<string | ErrorCode>;
   };
   /**
    * Endpoint para finalizar uma recarga iniciada em uma estação de carga com um carro.
@@ -345,7 +347,7 @@ export type RequestResponseMap = {
      * resposta de erro.
      * A resposta de sucesso contém a recarga finalizada.
      */
-    output: Response<Charge> | ErrorResponse<string>;
+    output: Response<Charge> | ErrorResponse<ErrorCode | string>;
   };
   /**
    * Endpoint para obter a lista de recargas de um usuário.
@@ -373,7 +375,7 @@ export type RequestResponseMap = {
      * resposta de erro.
      * A resposta de sucesso contém a lista de recargas do usuário.
      */
-    output: Response<Charge[]> | ErrorResponse<string>;
+    output: Response<Charge[]> | ErrorResponse<ErrorCode | string>;
   };
   /**
    * Endpoint para realizar o pagamento de uma recarga.
@@ -403,7 +405,7 @@ export type RequestResponseMap = {
      * resposta de erro.
      * A resposta de sucesso contém a recarga paga.
      */
-    output: Response<Charge> | ErrorResponse<string>;
+    output: Response<Charge> | ErrorResponse<ErrorCode | string>;
   };
 };
 

@@ -14,6 +14,7 @@ import { SharedData } from '../../store/shared-data.js';
 import { Logger } from '../../../../shared/index.js';
 import type { TCPResponse } from '../../../../shared/index.js';
 import { apiClient } from '../../../../shared/src/api/client.js';
+import type { ErrorCode } from '../../../../../src/error-codes.js';
 
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
@@ -24,7 +25,9 @@ export function ReserveStation(props: {
 }) {
 	const { station, onGoBack, car } = props;
 	const [response, setResponse] =
-		useState<TCPResponse<Response<undefined> | ErrorResponse<undefined>>>();
+		useState<
+			TCPResponse<Response<undefined> | ErrorResponse<undefined | ErrorCode>>
+		>();
 	const isAvaliable = station.state === 'avaliable';
 	const isReserved = station.state === 'reserved'; // Verifies if the station has reserves in the queue
 	const isTheFirstInQueue = station.reservations[0] === car.id; // Verifies if the user reserve has the highest priority in the queue

@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '../../error-codes.ts';
 import type {
   UserGroup,
   ChargeRecord,
@@ -24,7 +25,7 @@ export const rechargeList = curry(
       return {
         message: 'ERROR: User does not exist',
         success: false,
-        error: 'this field is not optional',
+        error: ERROR_CODES.USER_NOT_FOUND,
       };
     }
 

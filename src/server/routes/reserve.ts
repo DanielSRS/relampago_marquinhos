@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '../../error-codes.ts';
 import type {
   UserGroup,
   RequestHandler,
@@ -30,7 +31,7 @@ export const reserve = curry(
       return {
         message: 'User does not exist',
         success: false,
-        error: undefined,
+        error: ERROR_CODES.USER_NOT_FOUND,
       };
     }
 
