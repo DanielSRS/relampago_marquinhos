@@ -9,9 +9,16 @@ import type {
 import { SERVER_HOST, SERVER_PORT } from '../constants.js';
 import { tcpRequest } from '../../../shared/index.js';
 import { Logger } from '../../../shared/index.js';
+import { userStorage } from './persisted.js';
 
 export const SharedData = observable<{
-	car: Car;
+	/**
+	 * Usuário registrado
+	 *
+	 * undefined indica que a informação ainda não foi carregada
+	 * null indica que o usuário não está registrado
+	 */
+	car: Car | null | undefined;
 	selectedStation: Station;
 	// getSuggestions: () => void;
 	suggestions: Station[];
@@ -20,6 +27,23 @@ export const SharedData = observable<{
 	chargingCar: Charge;
 	charges: Charge[];
 }>();
+
+/**
+ * Observa alterações nas informações do usuário salvas
+ * no armazenamento local e atualiza o estado compartilhado
+ */
+const userStorageObserver = userStorage.subscribe<Car>('user', event => {
+	if (event.type === 'DELETED') {
+		SharedData.car.set(null);
+		return;
+	}
+	SharedData.car.set(event.newValue);
+});
+userStorageObserver.getInitialVelue().then(v => SharedData.car.set(v ?? null));
+
+export const saveUserToStorage = (user: Car) => {
+	userStorage.setMapAsync('user', user);
+};
 
 export async function getSuggestions(
 	location: Position,
