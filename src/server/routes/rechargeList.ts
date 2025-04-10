@@ -34,7 +34,7 @@ export const rechargeList = curry(
 
     Logger.debug('What is the value??: ', recharge_list);
 
-    if (rechargeList.length === 0) {
+    if (recharge_list.length === 0) {
       return {
         message:
           'WARNING: There is no recharge receipt associated with the user!',
