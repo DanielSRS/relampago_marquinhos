@@ -9,16 +9,27 @@ import { TabNavigation } from './tab-navigation.js';
 export default function App() {
 	const { exit } = useApp();
 	const car = use$(SharedData.car);
+
+	/**
+	 * Adicionando listener para o evento de pressionar a tecla "q"
+	 * para sair do aplicativo.
+	 */
 	useInput(input => {
 		if (input === 'q') {
 			exit();
 		}
 	});
 
+	/**
+	 * Buscando no amazenamento informações do usuário
+	 */
 	if (car === undefined) {
 		return <Text>Loading...</Text>;
 	}
 
+	/**
+	 * Se não houver usuário salvo no armazenamento, exibe a tela de registro
+	 */
 	if (car === null) {
 		return (
 			<RegisterUser
@@ -36,6 +47,11 @@ export default function App() {
 		);
 	}
 
+	/**
+	 * Se houver usuário salvo no armazenamento, exibe navegação principal
+	 * do app. A navegação é feita por abar, onde cada aba é uma página
+	 * diferente do app.
+	 */
 	return <TabNavigation />;
 }
 
