@@ -34,14 +34,16 @@ export default function App() {
 		return (
 			<RegisterUser
 				onUserCreated={user => {
+					const battery_level = getRandomNumber(20, 95);
 					saveUserToStorage({
 						...user,
 						location: {
 							x: getRandomNumber(0, 200),
 							y: getRandomNumber(0, 200),
 						},
+						batteryLevel: battery_level,
 					});
-					SharedData.battery_level.set(getRandomNumber(20, 95));
+					SharedData.battery_level.set(battery_level);
 				}}
 			/>
 		);
