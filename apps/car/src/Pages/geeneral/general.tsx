@@ -1,5 +1,10 @@
 import React from 'react';
-import { Logger, PositionCard, View } from '../../../../shared/index.js';
+import {
+	BatteryCard,
+	Logger,
+	PositionCard,
+	View,
+} from '../../../../shared/index.js';
 import { FLEX1 } from '../../../../shared/src/utils/constants.js';
 import type { Car } from '../../../../../src/main.types.js';
 import { useInput } from 'ink';
@@ -63,6 +68,7 @@ export function General(props: GeneralProps) {
 		<View style={FLEX1}>
 			<View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
 				<PositionCard position={car.location} />
+				<BatteryCard batteryLevel={car.batteryLevel} />
 			</View>
 			{}
 		</View>
