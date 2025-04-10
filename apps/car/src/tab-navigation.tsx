@@ -7,10 +7,10 @@ import { Computed } from '@legendapp/state/react';
 import { SharedData } from './store/shared-data.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { Charging } from './Pages/Charging/Charging.js';
-import { Charges } from './Pages/Charges/Charges.js';
 import { View } from '../../shared/index.js';
 import { About } from './Pages/about/about.js';
 import { General } from './Pages/geeneral/general.js';
+import { PaymentRoutes } from './routes/payment-routes.js';
 
 export function TabNavigation() {
 	const [activeTabName, setActiveTabName] = useState<string>('general');
@@ -37,7 +37,7 @@ export function TabNavigation() {
 				<Tab name="general">General</Tab>
 				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
-				<Tab name="baz">Baz</Tab>
+				<Tab name="baz">Pagamento</Tab>
 				<Tab name="about">About</Tab>
 			</Tabs>
 			<TabContent activeTab={activeTabName} />
@@ -81,11 +81,9 @@ function TabContent(props: { activeTab: string }) {
 			break;
 		case 'baz':
 			return (
-				<Computed>
-					{() => {
-						return <Charges />;
-					}}
-				</Computed>
+				<View style={{ ...FLEX1, paddingTop: 0 }}>
+					<PaymentRoutes />
+				</View>
 			);
 			break;
 		case 'about':

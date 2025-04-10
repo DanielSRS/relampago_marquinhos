@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { Logger } from '../../utils/utils.js';
 import { View } from '../View/View.js';
 import { Text } from 'ink';
+import { FLEX1 } from '../../utils/constants.js';
 
 // Types for our navigation system
 type RouteParams = Record<string, unknown>;
@@ -83,7 +84,7 @@ export const Navigator: React.FC<NavigatorProps> = ({
   // Provide navigation context and render current screen
   return (
     <NavigationContext.Provider value={{ state, navigate, goBack }}>
-      <View style={{ width: '100%', height: '100%' }}>
+      <View style={FLEX1}>
         {CurrentScreen ? (
           <CurrentScreen {...(currentRoute.params || {})} />
         ) : (
