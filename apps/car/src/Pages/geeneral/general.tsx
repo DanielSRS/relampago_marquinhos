@@ -60,6 +60,29 @@ export function General(props: GeneralProps) {
 			SharedData.car.location.x.set(nextX);
 			saveUserToStorage(SharedData.car.peek()!);
 		}
+
+		/**
+		 * Discharge battery
+		 */
+		if (input === 'u') {
+			Logger.info('Discharge battery');
+			const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
+			const nextBatteryLevel =
+				currentBatteryLevel > 0 ? currentBatteryLevel - 1 : 0;
+			SharedData.car.batteryLevel.set(nextBatteryLevel);
+			saveUserToStorage(SharedData.car.peek()!);
+		}
+		/**
+		 * Charge battery
+		 */
+		if (input === 'p') {
+			Logger.info('Charge battery');
+			const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
+			const nextBatteryLevel =
+				currentBatteryLevel < 100 ? currentBatteryLevel + 1 : 100;
+			SharedData.car.batteryLevel.set(nextBatteryLevel);
+			saveUserToStorage(SharedData.car.peek()!);
+		}
 	});
 
 	Logger.warn('It should render once');
