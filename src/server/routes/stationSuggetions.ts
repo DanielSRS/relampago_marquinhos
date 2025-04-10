@@ -3,12 +3,14 @@ import { calcRecomendations } from '../../main.ts';
 import { curry } from '../../utils.ts';
 import type { Car, StationGroup, RequestHandler } from '../../main.types.ts';
 
+type Handler = RequestHandler<'getSuggestions'>;
+
 export const getSuggestions = curry(
   (
     MAX_RADIUS: number,
     STATIONS: StationGroup,
-    data: Car,
-  ): ReturnType<RequestHandler<'getSuggestions'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const res = generateSuggestions(MAX_RADIUS, STATIONS, data);
     return {
       message: 'Lista de recomendações',

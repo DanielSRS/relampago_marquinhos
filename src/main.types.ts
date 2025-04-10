@@ -117,9 +117,14 @@ export type RequestResponseMap = {
   };
 };
 
-export type RequestHandler<K extends keyof RequestResponseMap> = (
+export type ApiRequestHandler<K extends keyof RequestResponseMap> = (
   data: RequestResponseMap[K]['input'],
 ) => RequestResponseMap[K]['output'];
+
+export type RequestHandler<K extends keyof RequestResponseMap> = {
+  data: RequestResponseMap[K]['input'];
+  res: RequestResponseMap[K]['output'];
+};
 
 type DefinedEndpoints = keyof RequestResponseMap;
 

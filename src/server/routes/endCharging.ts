@@ -21,17 +21,15 @@ import { curry } from '../../utils.ts';
 // Finalizar o Charge (salvar end time)
 // retornar o Charge para o usuário
 
+type Handler = RequestHandler<'endCharging'>;
+
 export const endCharging = curry(
   (
     stations: StationGroup,
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      stationId: number;
-      userId: number;
-      battery_level: number;
-    },
-  ): ReturnType<RequestHandler<'endCharging'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { stationId, userId, battery_level } = data;
     const station = stations[stationId];
     if (!station) {

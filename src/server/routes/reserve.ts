@@ -5,12 +5,14 @@ import type {
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
+type Handler = RequestHandler<'reserve'>;
+
 export const reserve = curry(
   (
     stations: StationGroup,
     users: UserGroup,
-    data: Parameters<RequestHandler<'reserve'>>[0],
-  ): ReturnType<RequestHandler<'reserve'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { stationId, userId } = data;
     const station = stations[stationId];
 

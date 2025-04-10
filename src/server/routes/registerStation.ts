@@ -1,17 +1,12 @@
-import type {
-  Station,
-  StationGroup,
-  RequestHandler,
-} from '../../main.types.ts';
 import { curry } from '../../utils.ts';
+import type { StationGroup, RequestHandler } from '../../main.types.ts';
+
+type Handler = RequestHandler<'registerStation'>;
 
 export const registerStation = curry(
-  (
-    stations: StationGroup,
-    newStation: Station,
-  ): ReturnType<RequestHandler<'registerStation'>> => {
+  (stations: StationGroup, data: Handler['data']): Handler['res'] => {
     const exists = Object.values(stations).find(
-      station => station.id === newStation.id,
+      station => station.id === data.id,
     );
 
     if (exists) {
@@ -22,11 +17,11 @@ export const registerStation = curry(
         error: 'ERROR: This id already belongs to another station!',
       };
     } else {
-      stations[newStation.id] = newStation;
+      stations[data.id] = data;
       return {
         message: 'The station has been successfully registered!',
         success: true,
-        data: newStation,
+        data: data,
       };
     }
   },

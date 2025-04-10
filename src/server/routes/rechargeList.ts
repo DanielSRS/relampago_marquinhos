@@ -5,6 +5,8 @@ import type {
 } from '../../main.types.ts';
 import { curry, Logger } from '../../utils.ts';
 
+type Handler = RequestHandler<'rechargeList'>;
+
 /**
  * Retorna a lista de recibos de recargas associados a um user
  * Se o cliente existe
@@ -13,10 +15,8 @@ export const rechargeList = curry(
   (
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      userId: number;
-    },
-  ): ReturnType<RequestHandler<'rechargeList'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { userId } = data;
 
     const user = users[userId];

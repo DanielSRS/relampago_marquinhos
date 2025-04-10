@@ -8,6 +8,8 @@ import type {
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
+type Handler = RequestHandler<'startCharging'>;
+
 /**
  * Iniciar recarga
  * Se o posto exite
@@ -22,12 +24,8 @@ export const startCharging = curry(
     stations: StationGroup,
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      stationId: number;
-      userId: number;
-      battery_level: number;
-    },
-  ): ReturnType<RequestHandler<'startCharging'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { stationId, userId, battery_level } = data;
     const station = stations[stationId];
     if (!station) {

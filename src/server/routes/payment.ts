@@ -5,6 +5,8 @@ import type {
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
+type Handler = RequestHandler<'payment'>;
+
 /**
  * Se o cliente existe
  * Se a recarga existe
@@ -15,12 +17,8 @@ export const payment = curry(
   (
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      userId: number;
-      chargeId: number;
-      hasPaid: boolean;
-    },
-  ): ReturnType<RequestHandler<'payment'>> => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { userId, chargeId } = data;
 
     const user = users[userId];

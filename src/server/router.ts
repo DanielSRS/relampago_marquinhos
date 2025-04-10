@@ -2,18 +2,21 @@ import { curry } from '../utils.ts';
 import type {
   Request,
   RequestResponseMap,
-  RequestHandler,
+  ApiRequestHandler,
 } from '../main.types.ts';
 
 export type ServerRouter = (request: Request) => () => void;
 
-type Routes<T extends keyof RequestResponseMap> = Record<T, RequestHandler<T>>;
+type Routes<T extends keyof RequestResponseMap> = Record<
+  T,
+  ApiRequestHandler<T>
+>;
 
 export function createRouter() {
   type Keys = keyof RequestResponseMap;
   const routes: Partial<Routes<Keys>> = {};
   const s = {
-    add<T extends keyof RequestResponseMap>(path: T, fn: RequestHandler<T>) {
+    add<T extends keyof RequestResponseMap>(path: T, fn: ApiRequestHandler<T>) {
       routes[path] = fn as unknown as (typeof routes)[T];
       return s;
     },
