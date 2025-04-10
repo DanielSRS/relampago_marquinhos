@@ -1,10 +1,10 @@
 import React from 'react';
-import { View } from '../../../components/View/View.js';
 import { useEffect } from 'react';
 import { useFocus, useInput, Text } from 'ink';
 import { use$ } from '@legendapp/state/react';
 import { SharedData } from '../../../store/shared-data.js';
 import type { Station } from '../../../../../../src/main.types.js';
+import { View } from '../../../../../shared/index.js';
 
 export const Suggestion = (props: {
 	station: Station;

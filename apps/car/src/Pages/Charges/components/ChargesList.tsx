@@ -1,13 +1,10 @@
 import { useRef } from 'react';
 import type { Charge } from '../../../../../../src/main.types.js';
-import {
-	ScrollView,
-	type ScrollViewRef,
-} from '../../../components/ScrollView/ScrollView.js';
 import { Text } from 'ink';
 import React from 'react';
-import { Logger } from '../../../utils/utils.js';
+import { Logger, ScrollView } from '../../../../../shared/index.js';
 import { ChargeItem } from './ChargeItem.js';
+import type { ScrollViewRef } from '../../../../../shared/index.js';
 
 interface ChargesListProps {
 	charges: Charge[];

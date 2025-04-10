@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from '../../../components/View/View.js';
+import { View } from '../../../../../shared/index.js';
 import { Text, useFocus, useInput } from 'ink';
 import type { Charge } from '../../../../../../src/main.types.js';
 

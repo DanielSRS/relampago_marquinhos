@@ -1,11 +1,11 @@
 import type {
   UserGroup,
-  Response,
-  ErrorResponse,
   ChargeRecord,
-  Charge,
+  RequestHandler,
 } from '../../main.types.ts';
 import { curry, Logger } from '../../utils.ts';
+
+type Handler = RequestHandler<'rechargeList'>;
 
 /**
  * Retorna a lista de recibos de recargas associados a um user
@@ -15,10 +15,8 @@ export const rechargeList = curry(
   (
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      userId: number;
-    },
-  ) => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { userId } = data;
 
     const user = users[userId];
@@ -27,7 +25,7 @@ export const rechargeList = curry(
         message: 'ERROR: User does not exist',
         success: false,
         error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const recharge_list = Object.values(chargeGroup).filter(
@@ -42,13 +40,13 @@ export const rechargeList = curry(
           'WARNING: There is no recharge receipt associated with the user!',
         success: true,
         data: recharge_list,
-      } satisfies Response<Charge[]>;
+      };
     } else {
       return {
         message: 'Recharge receipt list!',
         success: true,
         data: recharge_list,
-      } satisfies Response<Charge[]>;
+      };
     }
   },
 );

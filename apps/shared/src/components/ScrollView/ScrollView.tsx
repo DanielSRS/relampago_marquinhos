@@ -1,7 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Text, useInput } from 'ink';
 import { View, type ViewStyles } from '../View/View.js';
-import { Logger } from '../../utils/utils.js';
+import { Logger } from '../../../../shared/index.js';
 
 type Layout = { width: number; height: number };
 

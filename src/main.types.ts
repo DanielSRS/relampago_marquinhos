@@ -64,96 +64,86 @@ export function Station(
   };
 }
 
-export type RequestMap = {
+export type RequestResponseMap = {
   reserve: {
-    userId: number;
-    stationId: number;
+    input: {
+      userId: number;
+      stationId: number;
+    };
+    output: Response<undefined> | ErrorResponse<undefined>;
   };
-  getSuggestions: Car;
-  registerStation: Station;
-  registerUser: User;
+  getSuggestions: {
+    input: Car;
+    output: Response<Station[]>;
+  };
+  registerStation: {
+    input: Station;
+    output: Response<Station> | ErrorResponse<string>;
+  };
+  registerUser: {
+    input: User;
+    output: Response<User> | ErrorResponse<unknown>;
+  };
   startCharging: {
-    stationId: number;
-    userId: number;
-    battery_level: number;
+    input: {
+      stationId: number;
+      userId: number;
+      battery_level: number;
+    };
+    output: Response<Charge> | ErrorResponse<string>;
   };
   endCharging: {
-    chargeId: number;
-    stationId: number;
-    userId: number;
-    battery_level: number;
+    input: {
+      chargeId: number;
+      stationId: number;
+      userId: number;
+      battery_level: number;
+    };
+    output: Response<Charge> | ErrorResponse<string>;
   };
   rechargeList: {
-    userId: number;
+    input: {
+      userId: number;
+    };
+    output: Response<Charge[]> | ErrorResponse<string>;
   };
   payment: {
-    userId: number;
-    chargeId: number;
-    hasPaid: boolean;
+    input: {
+      userId: number;
+      chargeId: number;
+      hasPaid: boolean;
+    };
+    output: Response<Charge> | ErrorResponse<string>;
   };
 };
 
-export type Request =
-  | {
-      type: 'reserve';
-      data: {
-        userId: number;
-        stationId: number;
-      };
-    }
-  | {
-      type: 'getSuggestions';
-      data: Car;
-    }
-  | {
-      type: 'registerStation';
-      data: Station;
-    }
-  | {
-      type: 'registerUser';
-      data: User;
-    }
-  | {
-      type: 'startCharging';
-      data: {
-        stationId: number;
-        userId: number;
-        battery_level: number;
-      };
-    } 
-  | {
-      type: 'endCharging';
-      data: {
-        stationId: number;
-        userId: number;
-        battery_level: number;
-      };
-    }
-    | {
-      type: 'rechargeList';
-      data: {
-        userId: number;
-      };
-    }
-    | {
-      type: 'payment';
-      data: {
-        userId: number;
-        chargeId: number;
-        hasPaid: boolean;
-      };
-    };
-    
+export type ApiRequestHandler<K extends keyof RequestResponseMap> = (
+  data: RequestResponseMap[K]['input'],
+) => RequestResponseMap[K]['output'];
+
+export type RequestHandler<K extends keyof RequestResponseMap> = {
+  data: RequestResponseMap[K]['input'];
+  res: RequestResponseMap[K]['output'];
+};
+
+type DefinedEndpoints = keyof RequestResponseMap;
+
+type ApiRequest = {
+  type: DefinedEndpoints;
+  data: RequestResponseMap[DefinedEndpoints]['input'];
+};
+
+export type Request = ApiRequest;
 
 export type Response<T> = {
   message: string;
-  success: boolean;
+  success: true;
   data: T;
 };
 
 export type ErrorResponse<T> = {
   message: string;
-  success: boolean;
+  success: false;
   error: T;
 };
 

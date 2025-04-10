@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Text } from 'ink';
 import { Tabs, Tab } from 'ink-tab';
-import { View } from './components/View/View.js';
 import { FLEX1 } from './constants.js';
 import { Recomendations } from './Pages/Recomendations/Recomendations.js';
 import { Computed } from '@legendapp/state/react';
@@ -9,6 +8,8 @@ import { SharedData } from './store/shared-data.js';
 import { ReserveStation } from './Pages/ReserveStation/ReserveStation.js';
 import { Charging } from './Pages/Charging/Charging.js';
 import { Charges } from './Pages/Charges/Charges.js';
+import { View } from '../../shared/index.js';
+import { About } from './Pages/about/about.js';
 
 export function TabNavigation() {
 	const [activeTabName, setActiveTabName] = useState<string>('foo');
@@ -35,6 +36,7 @@ export function TabNavigation() {
 				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
 				<Tab name="baz">Baz</Tab>
+				<Tab name="about">About</Tab>
 			</Tabs>
 			<TabContent activeTab={activeTabName} />
 		</View>
@@ -61,7 +63,7 @@ function TabContent(props: { activeTab: string }) {
 								<ReserveStation
 									station={selectedStation}
 									onGoBack={() => SharedData.selectedStation.set(undefined)}
-									user={car}
+									car={car}
 								/>
 							);
 						}
@@ -84,7 +86,9 @@ function TabContent(props: { activeTab: string }) {
 				</Computed>
 			);
 			break;
-
+		case 'about':
+			return <About />;
+			break;
 		default:
 			return (
 				<View style={{ ...FLEX1, backgroundColor: 'magenta' }}>

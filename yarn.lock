@@ -994,6 +994,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/object-hash@npm:^3":
+  version: 3.0.6
+  resolution: "@types/object-hash@npm:3.0.6"
+  checksum: 10c0/a5450cafdbc33c840be2c36fb1ace96cce7aa580177cf68dbdbda80f18938207692d74c76403321c99f43460ac31981c4af7fe8b49eca1570f8e9a4c01eaf33d
+  languageName: node
+  linkType: hard
+
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.2
   resolution: "@types/parse-json@npm:4.0.2"
@@ -2025,6 +2032,7 @@ __metadata:
   dependencies:
     "@legendapp/state": "npm:^3.0.0-beta.30"
     "@sindresorhus/tsconfig": "npm:^3.0.1"
+    "@types/object-hash": "npm:^3"
     "@types/react": "npm:^18.0.32"
     "@vdemedes/prettier-config": "npm:^2.0.1"
     ava: "npm:^5.2.0"
@@ -2039,6 +2047,7 @@ __metadata:
     ink-testing-library: "npm:^3.0.0"
     ink-text-input: "npm:^6.0.0"
     meow: "npm:^11.0.0"
+    object-hash: "npm:^3.0.0"
     prettier: "npm:^2.8.7"
     react: "npm:^18.2.0"
     ts-node: "npm:^10.9.1"
@@ -5567,6 +5576,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"object-hash@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "object-hash@npm:3.0.0"
+  checksum: 10c0/a06844537107b960c1c8b96cd2ac8592a265186bfa0f6ccafe0d34eabdb526f6fa81da1f37c43df7ed13b12a4ae3457a16071603bcd39d8beddb5f08c37b0f47
+  languageName: node
+  linkType: hard
+
 "object-inspect@npm:^1.13.3":
   version: 1.13.4
   resolution: "object-inspect@npm:1.13.4"
@@ -6604,6 +6620,12 @@ __metadata:
   checksum: 10c0/ca5c3ccbba479d07c30460e367e66337cec825560b11e8ba9c5ebe13a2a0d6021ae34eddf94ff3dfe17a3104dc1f191519cb6c48378b503e5c3f36393938776a
   languageName: node
   linkType: hard
+
+"shared@workspace:apps/shared":
+  version: 0.0.0-use.local
+  resolution: "shared@workspace:apps/shared"
+  languageName: unknown
+  linkType: soft
 
 "shebang-command@npm:^2.0.0":
   version: 2.0.0

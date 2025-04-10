@@ -1,11 +1,10 @@
 import React, { useRef } from 'react';
 import { Text } from 'ink';
-import { Logger } from '../../../utils/utils.js';
+import { Logger, ScrollView } from '../../../../../shared/index.js';
 import { Suggestion } from './suggestion.js';
-import { ScrollView } from '../../../components/ScrollView/ScrollView.js';
 import { calculateDistance } from '../../../../../../src/location.js';
-import type { ScrollViewRef } from '../../../components/ScrollView/ScrollView.js';
 import type { Position, Station } from '../../../../../../src/main.types.js';
+import type { ScrollViewRef } from '../../../../../shared/index.js';
 
 export const SuggestionsList = (props: {
 	suggestions: Station[];

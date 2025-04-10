@@ -1,37 +1,32 @@
 import React, { useState } from 'react';
 import { Text, useInput } from 'ink';
-import { View } from '../../components/View/View.js';
 import type {
 	Station,
 	Request,
-	User,
 	Charge,
 	Response,
+	Car,
 } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
-import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
+import { tcpRequest, View } from '../../../../shared/index.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
-import { Logger } from '../../utils/utils.js';
-
-const carLocation = {
-	x: 10,
-	y: 10,
-};
-
-const SERVER_HOST = 'localhost'; //server IP
-const SERVER_PORT = 8080; // server port
+import { Logger } from '../../../../shared/index.js';
+import { SERVER_HOST, SERVER_PORT } from '../../constants.js';
+import type { TCPResponse } from '../../../../shared/index.js';
 
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
 export function ReserveStation(props: {
 	station: Station;
-	user: User;
+	car: Car;
 	onGoBack: () => void;
 }) {
-	const { station, onGoBack, user } = props;
+	const { station, onGoBack, car } = props;
 	const [response, setResponse] = useState<TCPResponse>();
 	const isAvaliable = station.state === 'avaliable';
+	const isReserved = station.state === 'reserved';					// Verifies if the station has reserves in the queue
+	const isTheFirstInQueue = (station.reservations[0] === car.id);		// Verifies if the user reserve has the highest priority in the queue
 
 	useInput((input, key) => {
 		if (key.backspace) {
@@ -49,7 +44,7 @@ export function ReserveStation(props: {
 				type: 'startCharging',
 				data: {
 					stationId: station.id,
-					userId: user.id,
+					userId: car.id,
 					battery_level: SharedData.battery_level.peek() ?? 50,
 				},
 			} satisfies Request,
@@ -77,7 +72,7 @@ export function ReserveStation(props: {
 				type: 'reserve',
 				data: {
 					stationId: station.id,
-					userId: user.id,
+					userId: car.id,
 				},
 			} satisfies Request,
 			SERVER_HOST,
@@ -114,7 +109,7 @@ export function ReserveStation(props: {
 				<Text>Fila: {station.reservations.length}</Text>
 				<Text>
 					Distância:{' '}
-					{calculateDistance(station.location, carLocation).toFixed(2)}u
+					{calculateDistance(station.location, car.location).toFixed(2)}u
 				</Text>
 				{/* <Text>Tipo: {station.type}</Text>
 						<Text>Preço: {station.price}</Text> */}
@@ -125,7 +120,7 @@ export function ReserveStation(props: {
 						label: 'Reservar',
 						value: 'reserve',
 					},
-					isAvaliable
+					(isAvaliable || (isReserved === isTheFirstInQueue))
 						? {
 								label: 'Iniciar recarga',
 								value: 'charge',

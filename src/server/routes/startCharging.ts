@@ -1,13 +1,14 @@
 import type {
   StationGroup,
   UserGroup,
-  Response,
-  ErrorResponse,
   ChargeRecord,
   Charge,
   Station,
+  RequestHandler,
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
+
+type Handler = RequestHandler<'startCharging'>;
 
 /**
  * Iniciar recarga
@@ -23,57 +24,59 @@ export const startCharging = curry(
     stations: StationGroup,
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      stationId: number;
-      userId: number;
-      battery_level: number
-    },
-  ) => {
+    data: Handler['data'],
+  ): Handler['res'] => {
     const { stationId, userId, battery_level } = data;
     const station = stations[stationId];
     if (!station) {
       return {
         message: 'Station does not exist',
-        success: true,
+        success: false,
         error: 'this field is required',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const user = users[userId];
     if (!user) {
       return {
         message: 'User does not exist',
-        success: true,
+        success: false,
         error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     if (station.state === 'charging-car') {
       return {
         message: 'Cannot use this station',
-        success: true,
+        success: false,
         error: 'Station is already being used',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     if (station.state === 'reserved' && station.reservations[0] !== userId) {
       return {
         message: 'Cannot use this station',
-        success: true,
+        success: false,
         error: 'This station is reserved for another user',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
-    const alredyCharging = Object.values(chargeGroup).reduce((prev, current) => {
-      return prev || (current.endTime == current.startTime) && current.userId ===userId
-    }, false);
+    const alredyCharging = Object.values(chargeGroup).reduce(
+      (prev, current) => {
+        return (
+          prev ||
+          (current.endTime == current.startTime && current.userId === userId)
+        );
+      },
+      false,
+    );
 
     if (alredyCharging) {
       return {
         message: 'User is already using a station',
-        success: true,
+        success: false,
         error: 'Cannot start more than one charging',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     // remover reserva
@@ -86,7 +89,7 @@ export const startCharging = curry(
     const newChage: Charge = {
       // MUDAR ISSO AQUI
       chargeId: Object.values(chargeGroup).length,
-      cost: battery_level*6.02,
+      cost: battery_level * 6.02,
       endTime: startDate,
       startTime: startDate,
       stationId: station.id,
@@ -103,7 +106,7 @@ export const startCharging = curry(
       message: 'Recharging has been succesfully initialized',
       success: true,
       data: newChage,
-    } satisfies Response<Charge>;
+    };
   },
 );
 
@@ -112,6 +115,6 @@ function occupyStation(station: Station, chargeId: number) {
   if (station.state === 'charging-car') {
     station.onUse = chargeId;
   } else {
-    throw 'this should never happens'
+    throw 'this should never happens';
   }
 }

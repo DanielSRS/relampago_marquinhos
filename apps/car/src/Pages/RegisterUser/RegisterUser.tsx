@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Text } from 'ink';
-import { View } from '../../components/View/View.js';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
-import { tcpRequest } from '../../tcp/tcp.js';
+import { tcpRequest, View } from '../../../../shared/index.js';
 import Spinner from 'ink-spinner';
+import { hasMouseEventEmitedRecently } from '../../../../shared/src/utils/mouse-events.js';
 import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import type { Request, User, Response } from '../../../../../src/main.types.js';
+
+// const log = Logger.extend('RegisterUser');
 
 export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 	const { onUserCreated } = props;
@@ -82,7 +84,13 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 					<Text>Input the user id: </Text>
 					<TextInput
 						value={idField}
-						onChange={setIdFiled}
+						onChange={value => {
+							if (hasMouseEventEmitedRecently()) {
+								// log.debug('Mouse event detected, ignoring input');
+								return;
+							}
+							setIdFiled(value);
+						}}
 						placeholder="It needs to be a number"
 						onSubmit={value => {
 							const parsed = parseInt(value);

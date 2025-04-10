@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from '../../components/View/View.js';
+import { View } from '../../../../shared/index.js';
 import { FLEX1 } from '../../constants.js';
 import { use$ } from '@legendapp/state/react';
 import { getCharges, SharedData } from '../../store/shared-data.js';
