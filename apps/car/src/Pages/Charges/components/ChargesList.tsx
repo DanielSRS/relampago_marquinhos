@@ -17,7 +17,7 @@ interface ChargesListProps {
 }
 
 export function ChargesList(props: ChargesListProps) {
-	const { charges } = props;
+	const { charges, onSelectCharge } = props;
 	const scrollRef = useRef<ScrollViewRef>(null);
 	if (charges.length === 0) {
 		return (
@@ -43,6 +43,9 @@ export function ChargesList(props: ChargesListProps) {
 					charge={charge}
 					onFocus={() => {
 						scrollToItemPosition(8, index, scrollRef.current);
+					}}
+					onPress={() => {
+						onSelectCharge?.(charge);
 					}}
 				/>
 			))}

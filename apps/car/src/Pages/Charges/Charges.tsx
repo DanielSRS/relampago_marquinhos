@@ -25,7 +25,7 @@ export function Charges(props: ChargesProps) {
 		}
 	});
 	return (
-		<View style={{...FLEX1, marginTop: 1}}>
+		<View style={{ ...FLEX1, marginTop: 1 }}>
 			<ChargesList
 				charges={charges}
 				onSelectCharge={s => {

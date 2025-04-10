@@ -6,8 +6,8 @@ export function ChargesPage() {
 	const navigation = useNavigation();
 	return (
 		<Charges
-			onSelectCharge={() => {
-				navigation.goBack();
+			onSelectCharge={charge => {
+				navigation.navigate('chargeItem', charge);
 			}}
 		/>
 	);
