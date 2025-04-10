@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppRegistry } from '../../shared/index.js';
 import { useApp, useInput, Text } from 'ink';
 import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
 import { saveUserToStorage, SharedData } from './store/shared-data.js';
 import { use$ } from '@legendapp/state/react';
 import { TabNavigation } from './tab-navigation.js';
+import { dischargeBattery } from './utils/battery.js';
 
 export default function App() {
 	const { exit } = useApp();
 	const car = use$(SharedData.car);
+
+	useEffect(() => {
+		const timer = setInterval(() => {
+			// Discharge battery on every e seconds
+			dischargeBattery();
+		}, 3000);
+		return () => {
+			clearInterval(timer);
+		};
+	}, []); // Pass in empty array to run effect only once!
 
 	/**
 	 * Adicionando listener para o evento de pressionar a tecla "q"

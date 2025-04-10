@@ -9,6 +9,7 @@ import { FLEX1 } from '../../../../shared/src/utils/constants.js';
 import type { Car } from '../../../../../src/main.types.js';
 import { useInput } from 'ink';
 import { saveUserToStorage, SharedData } from '../../store/shared-data.js';
+import { chargeBattery, dischargeBattery } from '../../utils/battery.js';
 
 interface GeneralProps {
 	car: Car;
@@ -102,22 +103,4 @@ export function General(props: GeneralProps) {
 			{}
 		</View>
 	);
-}
-
-function dischargeBattery() {
-	Logger.info('Discharge battery');
-	const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
-	const nextBatteryLevel =
-		currentBatteryLevel > 0 ? currentBatteryLevel - 1 : 0;
-	SharedData.car.batteryLevel.set(nextBatteryLevel);
-	saveUserToStorage(SharedData.car.peek()!);
-}
-
-function chargeBattery() {
-	Logger.info('Charge battery');
-	const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
-	const nextBatteryLevel =
-		currentBatteryLevel < 100 ? currentBatteryLevel + 1 : 100;
-	SharedData.car.batteryLevel.set(nextBatteryLevel);
-	saveUserToStorage(SharedData.car.peek()!);
 }
