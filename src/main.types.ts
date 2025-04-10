@@ -190,59 +190,232 @@ export function Station(
   };
 }
 
+/**
+ * Mapeamento entre os tipos de requisição e resposta da API.
+ * O mapeamento é usado para definir os tipos de entrada e saída
+ * de cada endpoint da API.
+ * Cada chave do mapeamento representa um endpoint da API.
+ * O valor da chave é um objeto que contém os tipos de entrada e
+ * saída do endpoint.
+ * O tipo de entrada é o tipo de dado que deve ser enviado para
+ * o endpoint.
+ * O tipo de saída é o tipo de dado que o endpoint retorna.
+ * O tipo de saída pode ser uma resposta de sucesso ou uma
+ * resposta de erro.
+ */
 export type RequestResponseMap = {
+  /**
+   * Endpoint para obter reservar uma estação de carga.
+   */
   reserve: {
+    /**
+     * Tipo de entrada da requisição.
+     */
     input: {
+      /**
+       * O id do usuário que está reservando a estação.
+       * O usuário deve existir.
+       */
       userId: number;
+      /**
+       * O id da estação que está sendo reservada.
+       * A estação deve existir.
+       */
       stationId: number;
     };
+    /**
+     * Tipo de saída da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     */
     output: Response<undefined> | ErrorResponse<undefined>;
   };
+  /**
+   * Endpoint para obter a sugestão de estações para recarregar o carro.
+   */
   getSuggestions: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada é o carro que está solicitando a
+     * sugestão de estações.
+     * O carro deve existir.
+     */
     input: Car;
+    /**
+     * Tipo de resposta da requisição.
+     */
     output: Response<Station[]>;
   };
+  /**
+   * Endpoint para registrar uma nova estação de carga.
+   */
   registerStation: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada é a estação que está sendo registrada.
+     */
     input: Station;
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     * A resposta de sucesso contém a estação registrada.
+     * A resposta de erro contém uma mensagem de erro.
+     */
     output: Response<Station> | ErrorResponse<string>;
   };
+  /**
+   * Endpoint para registrar um novo usuário.
+   */
   registerUser: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada é o usuário que está sendo registrado.
+     */
     input: User;
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     * A resposta de sucesso contém o usuário registrado.
+     */
     output: Response<User> | ErrorResponse<unknown>;
   };
+  /**
+   * Endpoint para iniciar uma recarga em uma estação de carga com um carro.
+   */
   startCharging: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada são as informações do carro e da estação
+     *
+     */
     input: {
+      /**
+       * O id da estação que será usada para a recarga.
+       * A estação deve existir.
+       */
       stationId: number;
+      /**
+       * O id do carro que está sendo carregado.
+       */
       userId: number;
+      /**
+       * O nível da bateria do carro.
+       */
       battery_level: number;
     };
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     */
     output: Response<Charge> | ErrorResponse<string>;
   };
+  /**
+   * Endpoint para finalizar uma recarga iniciada em uma estação de carga com um carro.
+   */
   endCharging: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada são as informações do carro e da estação
+     */
     input: {
+      /**
+       * O id da recarga que será finalizada.
+       * A recarga deve existir.
+       */
       chargeId: number;
+      /**
+       * O id da estação que está em uso.
+       */
       stationId: number;
+      /**
+       * O id do carro que está sendo carregado.
+       */
       userId: number;
+      /**
+       * O nível da bateria do carro.
+       */
       battery_level: number;
     };
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     * A resposta de sucesso contém a recarga finalizada.
+     */
     output: Response<Charge> | ErrorResponse<string>;
   };
+  /**
+   * Endpoint para obter a lista de recargas de um usuário.
+   * A lista de recargas é uma lista de objetos do tipo Charge.
+   * Cada objeto da lista contém as informações de uma recarga.
+   * A lista de recargas é filtrada pelo id do usuário.
+   */
   rechargeList: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada é o id do usuário que está solicitando
+     * a lista de recargas.
+     * O id do usuário deve existir.
+     */
     input: {
+      /**
+       * O id do usuário que está solicitando a lista de recargas.
+       * O id do usuário deve existir.
+       */
       userId: number;
     };
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     * A resposta de sucesso contém a lista de recargas do usuário.
+     */
     output: Response<Charge[]> | ErrorResponse<string>;
   };
+  /**
+   * Endpoint para realizar o pagamento de uma recarga.
+   */
   payment: {
+    /**
+     * Tipo de entrada da requisição.
+     * O tipo de entrada são as informações da recarga e do usuário
+     * que está realizando o pagamento.
+     */
     input: {
+      /**
+       * O id do usuário que está realizando o pagamento.
+       * O id do usuário deve existir.
+       */
       userId: number;
+      /**
+       * O id da recarga que será paga.
+       * A recarga deve existir.
+       */
       chargeId: number;
       hasPaid: boolean;
     };
+    /**
+     * Tipo de resposta da requisição.
+     * A resposta pode ser uma resposta de sucesso ou uma
+     * resposta de erro.
+     * A resposta de sucesso contém a recarga paga.
+     */
     output: Response<Charge> | ErrorResponse<string>;
   };
 };
 
+/**
+ * Representa um request handler da API.
+ * O request handler é uma função que recebe um
+ * objeto de entrada e retorna um objeto de saída.
+ * O objeto de entrada e o objeto de saída são definidos
+ * pelo mapeamento de requisições e respostas da API.
+ * O manipulador de requisições é usado para processar
+ * as requisições da API e retornar as respostas.
+ */
 export type ApiRequestHandler<K extends keyof RequestResponseMap> = (
   data: RequestResponseMap[K]['input'],
 ) => RequestResponseMap[K]['output'];
@@ -252,13 +425,42 @@ export type RequestHandler<K extends keyof RequestResponseMap> = {
   res: RequestResponseMap[K]['output'];
 };
 
+/**
+ *  Api endpoint.
+ *  O endpoint é uma string que representa o nome do endpoint.
+ *  O endpoint é usado para identificar o manipulador de requisições
+ *  da API.
+ *  O endpoint é usado para enviar requisições para a API.
+ */
 type DefinedEndpoints = keyof RequestResponseMap;
 
+/**
+ * Representa uma requisição da API.
+ * A requisição é um objeto que contém o tipo do endpoint
+ * e os dados da requisição.
+ * O tipo do endpoint é usado para identificar o manipulador
+ * de requisições da API.
+ * Os dados da requisição são os dados que devem ser enviados
+ * para o endpoint.
+ */
 type ApiRequest = {
   type: DefinedEndpoints;
   data: RequestResponseMap[DefinedEndpoints]['input'];
 };
 
+/**
+ * Representa uma requisição da API.
+ * A requisição é um objeto que contém o tipo do endpoint
+ * e os dados da requisição.
+ * O tipo do endpoint é usado para identificar o manipulador
+ * de requisições da API.
+ * Os dados da requisição são os dados que devem ser enviados
+ * para o endpoint.
+ * O tipo da requisição é usado para identificar o manipulador
+ * de requisições da API.
+ * O tipo da requisição é usado para enviar requisições
+ * para a API.
+ */
 export type Request = ApiRequest;
 
 /**
@@ -302,6 +504,21 @@ export type ErrorResponse<T> = {
 
 export type Reservations = Record<number, number[]>;
 
+/**
+ * Cria um novo carro.
+ * @param id O id do carro. O id deve ser um número inteiro.
+ * @param x A coordenada x do carro no sistema de coordenadas.
+ * @param y A coordenada y do carro no sistema de coordenadas.
+ * @returns Um novo carro.
+ * @example
+ * const car = Car(1, 10, 20);
+ * // car = {
+ * // {
+ * //   id: 1,
+ * //   location: { x: 10, y: 20 },
+ * //   batteryLevel: 0,
+ * // }
+ */
 export function Car(id: number, x: number, y: number): Car {
   return {
     id,
