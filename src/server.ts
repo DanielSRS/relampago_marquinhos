@@ -2,7 +2,6 @@ import { z } from 'zod';
 import type {
   ErrorResponse,
   StationGroup,
-  Response,
   UserGroup,
   ChargeRecord,
 } from './main.types.ts';
@@ -197,11 +196,18 @@ const server = net.createServer(socket => {
           data.stationId,
           data.userId,
         );
+        if (result.success) {
+          return {
+            message: result.message,
+            success: true,
+            data: undefined,
+          };
+        }
         return {
           message: result.message,
-          success: result.success,
-          data: undefined,
-        } satisfies Response<unknown>;
+          success: false,
+          error: undefined,
+        };
       })
       .add('getSuggestions', getSuggestions(MAX_RADIUS, STATIONS))
       .add('registerStation', registerStation(STATIONS))

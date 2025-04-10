@@ -1,11 +1,9 @@
 import type {
   StationGroup,
   UserGroup,
-  Response,
-  ErrorResponse,
   ChargeRecord,
-  Charge,
   Station,
+  RequestHandler,
 } from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
@@ -33,42 +31,42 @@ export const endCharging = curry(
       userId: number;
       battery_level: number;
     },
-  ) => {
+  ): ReturnType<RequestHandler<'endCharging'>> => {
     const { stationId, userId, battery_level } = data;
     const station = stations[stationId];
     if (!station) {
       return {
         message: 'Station does not exist',
-        success: true,
+        success: false,
         error: 'this field is required',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const user = users[userId];
     if (!user) {
       return {
         message: 'User does not exist',
-        success: true,
+        success: false,
         error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     if (station.state !== 'charging-car') {
       return {
         message:
           'There is no car recharging now, so impossible to complete a recharge',
-        success: true,
+        success: false,
         error: 'Station is not at the charging-car state',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     if (station.onUse === -1) {
       return {
         message:
           'Because of a strange, absurd and  unknown reason, there is no recharge receipt associated with this station',
-        success: true,
+        success: false,
         error: 'No recharge receipt at this station',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const charge = chargeGroup[station.onUse];
@@ -76,17 +74,17 @@ export const endCharging = curry(
     if (!charge) {
       return {
         message: 'Recharge receipt does not exist',
-        success: true,
+        success: false,
         error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     if (charge.userId !== userId) {
       return {
         message: 'This recharge receipt refers to another car',
-        success: true,
+        success: false,
         error: 'This receipt recharge is associated with another user',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const endDate = new Date();
@@ -103,7 +101,7 @@ export const endCharging = curry(
       message: 'Recharging has been succesfully completed',
       success: true,
       data: charge,
-    } satisfies Response<Charge>;
+    };
   },
 );
 

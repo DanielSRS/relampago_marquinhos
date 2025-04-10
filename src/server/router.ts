@@ -1,21 +1,20 @@
 import { curry } from '../utils.ts';
-import type { Request, RequestMap } from '../main.types.ts';
+import type {
+  Request,
+  RequestResponseMap,
+  RequestHandler,
+} from '../main.types.ts';
 
 export type ServerRouter = (request: Request) => () => void;
 
-type Routes<T extends keyof RequestMap> = Record<
-  T,
-  (data: RequestMap[T]) => void
->;
+type Routes<T extends keyof RequestResponseMap> = Record<T, RequestHandler<T>>;
 
 export function createRouter() {
-  const routes: Partial<Routes<keyof RequestMap>> = {};
+  type Keys = keyof RequestResponseMap;
+  const routes: Partial<Routes<Keys>> = {};
   const s = {
-    add<T extends keyof RequestMap>(
-      path: T,
-      fn: (data: RequestMap[T]) => unknown,
-    ) {
-      routes[path] = fn;
+    add<T extends keyof RequestResponseMap>(path: T, fn: RequestHandler<T>) {
+      routes[path] = fn as unknown as (typeof routes)[T];
       return s;
     },
     all() {
@@ -26,7 +25,7 @@ export function createRouter() {
 }
 
 export const serverRouter = curry(
-  (routes: Routes<keyof RequestMap>, request: Request) => {
+  (routes: Routes<keyof RequestResponseMap>, request: Request) => {
     return routes[request.type];
   },
 );

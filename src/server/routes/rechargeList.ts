@@ -1,9 +1,7 @@
 import type {
   UserGroup,
-  Response,
-  ErrorResponse,
   ChargeRecord,
-  Charge,
+  RequestHandler,
 } from '../../main.types.ts';
 import { curry, Logger } from '../../utils.ts';
 
@@ -18,7 +16,7 @@ export const rechargeList = curry(
     data: {
       userId: number;
     },
-  ) => {
+  ): ReturnType<RequestHandler<'rechargeList'>> => {
     const { userId } = data;
 
     const user = users[userId];
@@ -27,7 +25,7 @@ export const rechargeList = curry(
         message: 'ERROR: User does not exist',
         success: false,
         error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+      };
     }
 
     const recharge_list = Object.values(chargeGroup).filter(
@@ -42,13 +40,13 @@ export const rechargeList = curry(
           'WARNING: There is no recharge receipt associated with the user!',
         success: true,
         data: recharge_list,
-      } satisfies Response<Charge[]>;
+      };
     } else {
       return {
         message: 'Recharge receipt list!',
         success: true,
         data: recharge_list,
-      } satisfies Response<Charge[]>;
+      };
     }
   },
 );
