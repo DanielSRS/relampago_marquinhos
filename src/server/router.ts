@@ -4,6 +4,7 @@ import type {
   RequestResponseMap,
   ApiRequestHandler,
 } from '../main.types.ts';
+import { connectionSchema } from '../schemas/connection.ts';
 
 export type ServerRouter = (request: Request) => () => void;
 
@@ -22,6 +23,18 @@ export function createRouter() {
     },
     all() {
       return routes;
+    },
+    validateAndDispach(request: Buffer<ArrayBufferLike>) {
+      // verifica se os dados estão no formato esperado
+      const data = connectionSchema.safeParse(JSON.parse(request.toString()));
+      if (!data.success) {
+        return {
+          message: 'erro',
+          success: false,
+          error: data.error,
+        };
+      }
+      return s.all()[data.data.type]?.(data.data.data);
     },
   };
   return s;
