@@ -1,34 +1,134 @@
 export interface Car {
+  /**
+   * Id do carro. O id deve ser um número inteiro.
+   * O id deve ser único para cada carro.
+   * @example 1
+   */
   id: number;
+  /**
+   * Localização do carro.
+   */
   location: Position;
 }
-
+/**
+ * Representa a posição dentro do sistema de coordenadas.
+ * O sistema de coordenadas é um plano cartesiano.
+ * O ponto (0, 0) representa o canto inferior esquerdo do plano.
+ * O ponto (x, y) representa a posição do carro ou da estação de carga.
+ * O ponto (x, y) é um número inteiro.
+ */
 export interface Position {
   x: number;
   y: number;
 }
 
+/**
+ * O estado da estação de carga.
+ * O estado pode ser 'avaliable', 'charging-car' ou 'reserved'.
+ * 'avaliable' significa que a estação está disponível para uso.
+ * 'charging-car' significa que a estação está em uso e está
+ * carregando um carro.
+ * 'reserved' significa que a estação está reservada para um carro.
+ */
 export type StationState = 'avaliable' | 'charging-car' | 'reserved';
 
+/**
+ * Representa uma recarga.
+ * Uma recarga é uma operação de carga de um carro em uma estação.
+ * A recarga tem um id, um id de usuário, um id de estação,
+ * um horário de início, um horário de término, um custo e um
+ * status de pagamento.
+ */
 export type Charge = {
+  /**
+   * Id da recarga. O id deve ser um número inteiro.
+   * O id deve ser único para cada recarga.
+   * @example 1
+   */
   chargeId: number;
+  /**
+   * Id do usuário. O id deve ser um número inteiro.
+   * O id deve ser único para cada usuário.
+   * O usuário associado ao id deve existir.
+   */
   userId: number;
+  /**
+   * Id da estação. O id deve ser um número inteiro.
+   * O id deve ser único para cada estação.
+   * A estação associada ao id deve existir.
+   */
   stationId: number;
+  /**
+   * Horário de início da recarga.
+   * O horário deve ser uma data válida.
+   */
   startTime: Date;
+  /**
+   * Horário de término da recarga.
+   */
   endTime: Date;
+  /**
+   * Custo da recarga.
+   */
   cost: number;
+  /**
+   * Status de pagamento da recarga.
+   * true indica que a recarga foi paga.
+   */
   hasPaid: boolean;
 };
 
+/**
+ * Representa uma estação de carga.
+ * Uma estação de carga é um ponto de recarga de um carro.
+ * A estação tem um id, uma localização, um estado e uma lista de
+ * reservas.
+ */
 export type Station = {
+  /**
+   * Id da estação. O id deve ser um número inteiro.
+   * O id deve ser único para cada estação.
+   */
   id: number;
+  /**
+   * Localização da estação no sistema de coordenadas.
+   */
   location: Position;
+  /**
+   * Fila de espera da estação.
+   * A fila de espera é uma lista de ids de usuários que
+   * reservaram a estação.
+   */
   reservations: number[];
+  /**
+   * Lista de carros/usuários para os quais a estação foi recomendada.
+   * É usado pelo algoritmo de recomendação para distribuir a demanda
+   * pelas estações de recarga
+   */
   suggestions: number[];
-} & (
+} & STATION_STATE;
+
+/**
+ * Estado da estação.
+ * O estado pode ser 'avaliable', 'charging-car' ou 'reserved'.
+ * 'avaliable' significa que a estação está disponível para uso.
+ * 'charging-car' significa que a estação está em uso e está
+ * carregando um carro.
+ * 'reserved' significa que a estação está reservada para um carro.
+ *
+ * Quando o estado for 'charging-car', o id da recarga
+ * deve ser passado no campo onUse.
+ */
+type STATION_STATE =
   | {
       state: 'charging-car';
-      // Id de uma recarga
+      /**
+       * Id da recarga em uso.
+       * O id deve ser um número inteiro.
+       * O representa uma recarga existente.
+       *
+       * @see {Charge}
+       */
       onUse: number;
     }
   | {
@@ -36,8 +136,7 @@ export type Station = {
     }
   | {
       state: 'reserved';
-    }
-);
+    };
 
 export type User = Omit<Car, 'location'>;
 
@@ -45,6 +144,24 @@ export type StationGroup = Record<number, Station>;
 export type ChargeRecord = Record<number, Charge>;
 export type UserGroup = Record<number, User>;
 
+/**
+ * Cria uma nova estação de carga.
+ * @param id O id da estação. O id deve ser um número inteiro.
+ * @param x A coordenada x da estação no sistema de coordenadas.
+ * @param y A coordenada y da estação no sistema de coordenadas.
+ * @param state O estado da estação.
+ * @returns Uma nova estação de carga.
+ * @example
+ * const station = Station(1, 10, 20, 'avaliable');
+ * // station = {
+ * // {
+ * //   id: 1,
+ * //   location: { x: 10, y: 20 },
+ * //   state: 'avaliable',
+ * //   reservations: [],
+ * //   suggestions: [],
+ * // }
+ */
 export function Station(
   id: number,
   x: number,
@@ -135,15 +252,42 @@ type ApiRequest = {
 
 export type Request = ApiRequest;
 
+/**
+ * Representa uma resposta da API.
+ * Representa uma resposta de sucesso.
+ */
 export type Response<T> = {
+  /**
+   * Mensagem de sucesso
+   */
   message: string;
   success: true;
+  /**
+   * Dados retornados pela API.
+   * Os dados podem ser de qualquer tipo.
+   * O tipo dos dados depende do endpoint da API.
+   * @example { id: 1, name: 'Bom dia' }
+   * @example null
+   * @example undefined
+   * @example [{ id: 1, name: 'Boa tarde' }]
+   */
   data: T;
 };
 
+/**
+ * Representa uma resposta de erro da API.
+ */
 export type ErrorResponse<T> = {
+  /**
+   * Mensagem de erro.
+   */
   message: string;
   success: false;
+  /**
+   * Erro retornado pela API.
+   * O erro pode ser de qualquer tipo.
+   * O tipo do erro depende do endpoint da API.
+   */
   error: T;
 };
 
