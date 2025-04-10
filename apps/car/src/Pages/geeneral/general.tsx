@@ -24,6 +24,10 @@ export function General(props: GeneralProps) {
 		 * Move the car up
 		 */
 		if (input === 'w') {
+			/**
+			 * Every time the car moves, the battery discharges
+			 */
+			dischargeBattery();
 			Logger.info('Going up');
 			const currentY = SharedData.car.location.y.peek() ?? 0;
 			const nextY = currentY < 150 ? currentY + 1 : 150;
@@ -34,6 +38,10 @@ export function General(props: GeneralProps) {
 		 * Move the car down
 		 */
 		if (input === 's') {
+			/**
+			 * Every time the car moves, the battery discharges
+			 */
+			dischargeBattery();
 			Logger.info('Going down');
 			const currentY = SharedData.car.location.y.peek() ?? 0;
 			const nextY = currentY > 0 ? currentY - 1 : 0;
@@ -44,6 +52,10 @@ export function General(props: GeneralProps) {
 		 * Move the car left
 		 */
 		if (input === 'a') {
+			/**
+			 * Every time the car moves, the battery discharges
+			 */
+			dischargeBattery();
 			Logger.info('Going left');
 			const currentX = SharedData.car.location.x.peek() ?? 0;
 			const nextX = currentX > 0 ? currentX - 1 : 0;
@@ -54,6 +66,10 @@ export function General(props: GeneralProps) {
 		 * Move the car right
 		 */
 		if (input === 'd') {
+			/**
+			 * Every time the car moves, the battery discharges
+			 */
+			dischargeBattery();
 			Logger.info('Going right');
 			const currentX = SharedData.car.location.x.peek() ?? 0;
 			const nextX = currentX < 200 ? currentX + 1 : 200;
@@ -65,23 +81,13 @@ export function General(props: GeneralProps) {
 		 * Discharge battery
 		 */
 		if (input === 'u') {
-			Logger.info('Discharge battery');
-			const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
-			const nextBatteryLevel =
-				currentBatteryLevel > 0 ? currentBatteryLevel - 1 : 0;
-			SharedData.car.batteryLevel.set(nextBatteryLevel);
-			saveUserToStorage(SharedData.car.peek()!);
+			dischargeBattery();
 		}
 		/**
 		 * Charge battery
 		 */
 		if (input === 'p') {
-			Logger.info('Charge battery');
-			const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
-			const nextBatteryLevel =
-				currentBatteryLevel < 100 ? currentBatteryLevel + 1 : 100;
-			SharedData.car.batteryLevel.set(nextBatteryLevel);
-			saveUserToStorage(SharedData.car.peek()!);
+			chargeBattery();
 		}
 	});
 
@@ -96,4 +102,22 @@ export function General(props: GeneralProps) {
 			{}
 		</View>
 	);
+}
+
+function dischargeBattery() {
+	Logger.info('Discharge battery');
+	const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
+	const nextBatteryLevel =
+		currentBatteryLevel > 0 ? currentBatteryLevel - 1 : 0;
+	SharedData.car.batteryLevel.set(nextBatteryLevel);
+	saveUserToStorage(SharedData.car.peek()!);
+}
+
+function chargeBattery() {
+	Logger.info('Charge battery');
+	const currentBatteryLevel = SharedData.car.batteryLevel.peek() ?? 0;
+	const nextBatteryLevel =
+		currentBatteryLevel < 100 ? currentBatteryLevel + 1 : 100;
+	SharedData.car.batteryLevel.set(nextBatteryLevel);
+	saveUserToStorage(SharedData.car.peek()!);
 }
