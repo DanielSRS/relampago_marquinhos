@@ -11,6 +11,19 @@ import { tcpRequest } from '../../../shared/index.js';
 import { Logger } from '../../../shared/index.js';
 import { userStorage } from './persisted.js';
 
+/**
+ * User key for local storage
+ */
+const USER_KEY = 'user';
+/**
+ * Indica se o usuário foi deletado. Existe apenas
+ * para evitar situações de concorrência onde o usuário
+ * é deletado do storage, mas um evento de atualização
+ * ainda é recebido e faz o usuário ser guardado novamente
+ * no storage de forma corrompida.
+ */
+let IS_USER_DELETED = false;
+
 export const SharedData = observable<{
 	/**
 	 * Usuário registrado
@@ -31,7 +44,7 @@ export const SharedData = observable<{
  * Observa alterações nas informações do usuário salvas
  * no armazenamento local e atualiza o estado compartilhado
  */
-const userStorageObserver = userStorage.subscribe<Car>('user', event => {
+const userStorageObserver = userStorage.subscribe<Car>(USER_KEY, event => {
 	if (event.type === 'DELETED') {
 		SharedData.car.set(null);
 		return;
@@ -41,7 +54,11 @@ const userStorageObserver = userStorage.subscribe<Car>('user', event => {
 userStorageObserver.getInitialVelue().then(v => SharedData.car.set(v ?? null));
 
 export const saveUserToStorage = (user: Car) => {
-	userStorage.setMapAsync('user', user);
+	if (IS_USER_DELETED) {
+		Logger.error('User was deleted from storage');
+		return;
+	}
+	userStorage.setMapAsync(USER_KEY, user);
 };
 
 export async function getSuggestions(
@@ -66,6 +83,11 @@ export async function getSuggestions(
 		return;
 	}
 	// log.error('Error: ', res.message, res.error);
+}
+
+export function deleteUser() {
+	IS_USER_DELETED = true;
+	userStorage.removeItemAsync(USER_KEY);
 }
 
 export async function getCharges(onResult: (d: Charge[]) => void) {
