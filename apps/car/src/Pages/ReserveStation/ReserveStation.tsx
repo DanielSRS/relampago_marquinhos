@@ -25,6 +25,8 @@ export function ReserveStation(props: {
 	const { station, onGoBack, car } = props;
 	const [response, setResponse] = useState<TCPResponse>();
 	const isAvaliable = station.state === 'avaliable';
+	const isReserved = station.state === 'reserved';					// Verifies if the station has reserves in the queue
+	const isTheFirstInQueue = (station.reservations[0] === car.id);		// Verifies if the user reserve has the highest priority in the queue
 
 	useInput((input, key) => {
 		if (key.backspace) {
@@ -118,7 +120,7 @@ export function ReserveStation(props: {
 						label: 'Reservar',
 						value: 'reserve',
 					},
-					isAvaliable
+					(isAvaliable || (isReserved === isTheFirstInQueue))
 						? {
 								label: 'Iniciar recarga',
 								value: 'charge',
