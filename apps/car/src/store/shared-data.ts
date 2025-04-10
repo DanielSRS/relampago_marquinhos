@@ -10,6 +10,7 @@ import { SERVER_HOST, SERVER_PORT } from '../constants.js';
 import { tcpRequest } from '../../../shared/index.js';
 import { Logger } from '../../../shared/index.js';
 import { userStorage } from './persisted.js';
+import { apiClient } from '../../../shared/src/api/client.js';
 
 /**
  * User key for local storage
@@ -91,21 +92,29 @@ export function deleteUser() {
 }
 
 export async function getCharges(onResult: (d: Charge[]) => void) {
-	const res = await tcpRequest(
-		{
-			type: 'rechargeList',
-			data: {
-				userId: SharedData.car.peek()?.id ?? -1,
-			},
-		} satisfies Request,
-		SERVER_HOST,
-		SERVER_PORT,
-	);
-	if (res.type === 'success') {
-		Logger.info('getCharges: ', res.data);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		onResult((res.data as any).data as Charge[]);
+	const res = await apiClient({
+		type: 'rechargeList',
+		data: {
+			userId: SharedData.car.peek()?.id ?? -1,
+		},
+	});
+	if (res.type !== 'success') {
+		Logger.error('getCharges tcp Error: ', res);
 		return;
 	}
-	Logger.error('getCharges Error: ', res.message, res.error);
+	// Logger.info('getCharges: ', res.data);
+	if (!res.data.success) {
+		Logger.error('getCharges response error: ', res);
+		if (
+			typeof res.data.error === 'object' &&
+			res.data.error.code === 'USER_NOT_FOUND'
+		) {
+			Logger.error('Server lost user data??', res.data);
+			// Log user out
+			deleteUser();
+			return;
+		}
+		return;
+	}
+	onResult(res.data.data);
 }
