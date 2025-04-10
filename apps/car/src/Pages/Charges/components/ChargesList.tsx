@@ -2,7 +2,10 @@ import { useRef } from 'react';
 import type { Charge } from '../../../../../../src/main.types.js';
 import { Text } from 'ink';
 import React from 'react';
-import { Logger, ScrollView } from '../../../../../shared/index.js';
+import {
+	scrollToItemPosition,
+	ScrollView,
+} from '../../../../../shared/index.js';
 import { ChargeItem } from './ChargeItem.js';
 import type { ScrollViewRef } from '../../../../../shared/index.js';
 
@@ -24,22 +27,7 @@ export function ChargesList(props: ChargesListProps) {
 					key={index}
 					charge={charge}
 					onFocus={() => {
-						if (!scrollRef.current) {
-							return;
-						}
-						const startOffset = scrollRef.current.getScrollOffset();
-						// const viewportHeight = scrollRef.current.getViewportSize();
-						const itemOffset = index * 8;
-						Logger.error('Item offset: ', startOffset, itemOffset);
-						if (startOffset < itemOffset) {
-							scrollRef.current.scrollTo(index * 8);
-						}
-						if (itemOffset + 6 < startOffset) {
-							scrollRef.current.scrollTo(index * 8);
-						}
-					}}
-					onPress={() => {
-						Logger.info('Selected charge: ', charge);
+						scrollToItemPosition(8, index, scrollRef.current);
 					}}
 				/>
 			))}
