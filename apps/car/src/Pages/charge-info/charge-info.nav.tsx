@@ -12,5 +12,5 @@ export function chargeInfoPage() {
 		return <Text>Invalid params??</Text>;
 	}
 
-	return <ChargeInfo charge={charge as Charge} />;
+	return <ChargeInfo charge={charge as Charge} onGoBack={navigation.goBack} />;
 }
