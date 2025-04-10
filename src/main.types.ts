@@ -147,7 +147,7 @@ type STATION_STATE =
       state: 'reserved';
     };
 
-export type User = Omit<Car, 'location'>;
+export type User = Omit<Car, 'location' | 'batteryLevel'>;
 
 export type StationGroup = Record<number, Station>;
 export type ChargeRecord = Record<number, Charge>;
