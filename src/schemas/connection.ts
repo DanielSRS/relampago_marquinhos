@@ -53,4 +53,10 @@ export const connectionSchema = z.discriminatedUnion('type', [
       hasPaid: z.boolean(),
     }),
   }),
+  z.object({
+    type: z.literal('getStationInfo'),
+    data: z.object({
+      id: z.number(),
+    }),
+  }),
 ]);

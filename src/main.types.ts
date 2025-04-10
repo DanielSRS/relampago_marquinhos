@@ -407,6 +407,15 @@ export type RequestResponseMap = {
      */
     output: Response<Charge> | ErrorResponse<ErrorCode | string>;
   };
+  getStationInfo: {
+    input: {
+      /**
+       * Id da estação
+       */
+      id: number;
+    }
+    output: Response<Station> | ErrorResponse<ErrorCode>;
+  }
 };
 
 /**

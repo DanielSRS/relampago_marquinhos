@@ -10,6 +10,7 @@ import { rechargeList } from './server/routes/rechargeList.ts';
 import { payment } from './server/routes/payment.ts';
 import { reserve } from './server/routes/reserve.ts';
 import { CHARGES, STATIONS, USERS } from './server/data/data.ts';
+import { getStationInfo } from './server/routes/getStationInfo.ts';
 
 const HOST = '0.0.0.0';
 const PORT = 8080;
@@ -28,6 +29,7 @@ const server = net.createServer(socket => {
       .add('startCharging', startCharging(STATIONS, USERS, CHARGES))
       .add('endCharging', endCharging(STATIONS, USERS, CHARGES))
       .add('rechargeList', rechargeList(USERS, CHARGES))
+      .add('getStationInfo', getStationInfo(STATIONS))
       .add('payment', payment(USERS, CHARGES));
 
     const response = router.validateAndDispach(connection);
