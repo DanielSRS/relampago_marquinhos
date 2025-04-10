@@ -75,6 +75,7 @@ export function ReserveStation(props: {
 			const apiResponse = res.data;
 			if (apiResponse.success) {
 				SharedData.reservedStation.set(station);
+				SharedData.reservedStation.reservations.push(car.id);
 			}
 		}
 		setResponse(res);
