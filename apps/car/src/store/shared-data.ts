@@ -86,6 +86,11 @@ export async function getSuggestions(
 	// log.error('Error: ', res.message, res.error);
 }
 
+export function saveNewUser(user: Car) {
+	IS_USER_DELETED = false;
+	saveUserToStorage(user);
+}
+
 export function deleteUser() {
 	IS_USER_DELETED = true;
 	userStorage.removeItemAsync(USER_KEY);

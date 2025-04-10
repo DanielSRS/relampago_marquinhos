@@ -2,29 +2,17 @@ import React, { useEffect } from 'react';
 import { AppRegistry } from '../../shared/index.js';
 import { useApp, useInput, Text } from 'ink';
 import { RegisterUser } from './Pages/RegisterUser/RegisterUser.js';
-import { saveUserToStorage, SharedData } from './store/shared-data.js';
+import { saveNewUser, SharedData } from './store/shared-data.js';
 import { use$ } from '@legendapp/state/react';
 import { TabNavigation } from './tab-navigation.js';
-import { chargeBattery, dischargeBattery } from './utils/battery.js';
+import { carBatteryService } from './store/services.js';
 
 export default function App() {
 	const { exit } = useApp();
 	const car = use$(SharedData.car);
 
 	useEffect(() => {
-		const timer = setInterval(() => {
-			const isCharging = !!SharedData.chargingCar.peek();
-			if (isCharging) {
-				chargeBattery();
-				return;
-			}
-
-			// Discharge battery on every 3 seconds
-			dischargeBattery();
-		}, 3000);
-		return () => {
-			clearInterval(timer);
-		};
+		return carBatteryService();
 	}, []); // Pass in empty array to run effect only once!
 
 	/**
@@ -51,7 +39,7 @@ export default function App() {
 		return (
 			<RegisterUser
 				onUserCreated={user => {
-					saveUserToStorage({
+					saveNewUser({
 						...user,
 						location: {
 							x: getRandomNumber(0, 200),
