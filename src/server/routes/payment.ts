@@ -38,7 +38,15 @@ export const payment = curry(
       return {
         message: 'Recharge not found or does not belong to the user.',
         success: false,
-        error: 'this field is not optional',
+        error: 'The payment has been canceled.',
+      };
+    }
+
+    if (recharge.hasPaid) {
+      return {
+        message: 'WARNING: This recharge has already been paid.',
+        success: false,
+        error: 'It was not possible to pay this recharge receipt',
       };
     }
 
