@@ -10,9 +10,10 @@ import { Charging } from './Pages/Charging/Charging.js';
 import { Charges } from './Pages/Charges/Charges.js';
 import { View } from '../../shared/index.js';
 import { About } from './Pages/about/about.js';
+import { General } from './Pages/geeneral/general.js';
 
 export function TabNavigation() {
-	const [activeTabName, setActiveTabName] = useState<string>('foo');
+	const [activeTabName, setActiveTabName] = useState<string>('general');
 
 	// the handleTabChange method get two arguments:
 	// - the tab name
@@ -29,10 +30,11 @@ export function TabNavigation() {
 		<View style={FLEX1}>
 			<Tabs
 				onChange={handleTabChange}
-				defaultValue="foo"
+				defaultValue="general"
 				keyMap={{
 					useTab: false,
 				}}>
+				<Tab name="general">General</Tab>
 				<Tab name="foo">Charging</Tab>
 				<Tab name="bar">Recomendations</Tab>
 				<Tab name="baz">Baz</Tab>
@@ -88,6 +90,11 @@ function TabContent(props: { activeTab: string }) {
 			break;
 		case 'about':
 			return <About />;
+			break;
+		case 'general':
+			return (
+				<Computed>{() => <General car={SharedData.car.get()!} />}</Computed>
+			);
 			break;
 		default:
 			return (
