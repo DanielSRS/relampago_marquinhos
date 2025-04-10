@@ -1,32 +1,47 @@
 import { curry } from '../utils.ts';
-import type { Request, RequestMap } from '../main.types.ts';
+import type {
+  Request,
+  RequestResponseMap,
+  ApiRequestHandler,
+} from '../main.types.ts';
+import { connectionSchema } from '../schemas/connection.ts';
 
 export type ServerRouter = (request: Request) => () => void;
 
-type Routes<T extends keyof RequestMap> = Record<
+type Routes<T extends keyof RequestResponseMap> = Record<
   T,
-  (data: RequestMap[T]) => void
+  ApiRequestHandler<T>
 >;
 
 export function createRouter() {
-  const routes: Partial<Routes<keyof RequestMap>> = {};
+  type Keys = keyof RequestResponseMap;
+  const routes: Partial<Routes<Keys>> = {};
   const s = {
-    add<T extends keyof RequestMap>(
-      path: T,
-      fn: (data: RequestMap[T]) => unknown,
-    ) {
-      routes[path] = fn;
+    add<T extends keyof RequestResponseMap>(path: T, fn: ApiRequestHandler<T>) {
+      routes[path] = fn as unknown as (typeof routes)[T];
       return s;
     },
     all() {
       return routes;
+    },
+    validateAndDispach(request: Buffer<ArrayBufferLike>) {
+      // verifica se os dados estão no formato esperado
+      const data = connectionSchema.safeParse(JSON.parse(request.toString()));
+      if (!data.success) {
+        return {
+          message: 'erro',
+          success: false,
+          error: data.error,
+        };
+      }
+      return s.all()[data.data.type]?.(data.data.data);
     },
   };
   return s;
 }
 
 export const serverRouter = curry(
-  (routes: Routes<keyof RequestMap>, request: Request) => {
+  (routes: Routes<keyof RequestResponseMap>, request: Request) => {
     return routes[request.type];
   },
 );

@@ -1,14 +1,23 @@
-import type { User, Response, UserGroup } from '../../main.types.ts';
+import type {
+  User,
+  Response,
+  UserGroup,
+  RequestHandler,
+} from '../../main.types.ts';
 import { curry } from '../../utils.ts';
 
-export const registerUser = curry((cars: UserGroup, newUser: User) => {
-  // Verificar se a carro ja existe ????
+type Handler = RequestHandler<'registerUser'>;
 
-  cars[newUser.id] = newUser;
+export const registerUser = curry(
+  (cars: UserGroup, data: Handler['data']): Handler['res'] => {
+    // Verificar se a carro ja existe ????
 
-  return {
-    message: 'User registered',
-    success: true,
-    data: newUser,
-  } satisfies Response<User>;
-});
+    cars[data.id] = data;
+
+    return {
+      message: 'User registered',
+      success: true,
+      data: data,
+    } satisfies Response<User>;
+  },
+);

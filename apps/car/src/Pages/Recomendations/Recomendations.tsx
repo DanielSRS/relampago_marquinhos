@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, type ViewStyles } from '../../components/View/View.js';
 import { Text, useInput } from 'ink';
 import type { Station, Position } from '../../../../../src/main.types.js';
 // import { Logger } from '../../utils/utils.js';
 import { FLEX1 } from '../../constants.js';
 import { SuggestionsList } from './components/suggestions-list.js';
-import { Computed, use$ } from '@legendapp/state/react';
+import { use$ } from '@legendapp/state/react';
 import { getSuggestions, SharedData } from '../../store/shared-data.js';
+import { View } from '../../../../shared/index.js';
+import type { ViewStyles } from '../../../../shared/index.js';
 
 // const log = Logger.extend('Recomendations');
 
@@ -35,7 +36,7 @@ export function Recomendations(props: RecomendationsProps) {
 				style={{
 					...FLEX1,
 					// Header size
-					marginTop: 9,
+					marginTop: 5,
 				}}>
 				<SuggestionsList
 					suggestions={suggestions}
@@ -58,37 +59,6 @@ export function Recomendations(props: RecomendationsProps) {
 					padding: 1,
 					backgroundColor: 'black',
 				}}>
-				<View style={{ flexDirection: 'row' }}>
-					{/* Position card */}
-					<View style={{ padding: 1 }}>
-						<View style={{ marginTop: -1 }}>
-							<Text>Posição</Text>
-						</View>
-						<Computed>
-							{() => {
-								const pos = SharedData.car.location.get();
-								const x = pos?.x ?? -1
-								const y = pos?.y ?? -1
-								return (
-									<>
-									<Text>x: {x}</Text>
-									<Text>y: {y}</Text>
-									</>
-								)
-							}}
-						</Computed>
-					</View>
-
-					{/* Battery level*/}
-					<View style={{ padding: 1 }}>
-						<View style={{ marginTop: -1 }}>
-							<Text>Nível da bateria</Text>
-						</View>
-						<Computed>
-							{() => <Text>{SharedData.battery_level.get()}%</Text>}
-						</Computed>
-					</View>
-				</View>
 				<View>
 					<Text>
 						Press <Text color={'red'}>q</Text> to exit

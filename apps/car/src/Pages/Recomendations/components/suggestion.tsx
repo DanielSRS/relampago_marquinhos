@@ -1,10 +1,10 @@
 import React from 'react';
-import { View } from '../../../components/View/View.js';
 import { useEffect } from 'react';
 import { useFocus, useInput, Text } from 'ink';
 import { use$ } from '@legendapp/state/react';
 import { SharedData } from '../../../store/shared-data.js';
 import type { Station } from '../../../../../../src/main.types.js';
+import { View } from '../../../../../shared/index.js';
 
 export const Suggestion = (props: {
 	station: Station;
@@ -14,7 +14,11 @@ export const Suggestion = (props: {
 }) => {
 	const { station, onPress, onFocus, distance } = props;
 	const reservedStation = use$(SharedData.reservedStation);
-	const isThisReserved = station.id === reservedStation?.id;
+	const userId = use$(SharedData.car.id);
+	const positionInReserveList =
+		station.reservations.findIndex(id => id === userId) + 1;
+	const isThisReserved =
+		positionInReserveList > 0 || station.id === reservedStation?.id;
 	const { isFocused } = useFocus();
 
 	useEffect(() => {
@@ -37,9 +41,13 @@ export const Suggestion = (props: {
 				backgroundColor: isThisReserved ? 'greenBright' : undefined,
 			}}>
 			<Text>Nome: {station.id}</Text>
-			<Text>Estado: {station.state}</Text>
-			<Text>Fila: {station.reservations.length}</Text>
-			<Text>Distância: {distance}u</Text>
+			<Text>State: {station.state}</Text>
+			<Text>
+				Queue: {station.reservations.length}
+				<Text>{isThisReserved ? ' (your position is: ' : ''}</Text>
+				<Text>{isThisReserved ? positionInReserveList + '°)' : ''}</Text>
+			</Text>
+			<Text>Distancly: {distance}u</Text>
 			{/* <Text>Tipo: {station.type}</Text>
 			<Text>Preço: {station.price}</Text> */}
 		</View>

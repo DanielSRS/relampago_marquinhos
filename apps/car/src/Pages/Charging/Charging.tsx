@@ -1,17 +1,16 @@
 import React from 'react';
-import { View } from '../../components/View/View.js';
 import { Text } from 'ink';
 import { use$ } from '@legendapp/state/react';
 import { SharedData } from '../../store/shared-data.js';
 import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
 import SelectInput from 'ink-select-input';
-import { Logger } from '../../utils/utils.js';
+import { Logger, View } from '../../../../shared/index.js';
 import type {
 	Charge,
 	Request,
 	Response,
 } from '../../../../../src/main.types.js';
-import { tcpRequest } from '../../tcp/tcp.js';
+import { tcpRequest } from '../../../../shared/index.js';
 
 interface ChargingProps {
 	showProgress?: boolean;
@@ -20,7 +19,7 @@ interface ChargingProps {
 export function Charging(props: ChargingProps) {
 	const {} = props;
 	const charge = use$(SharedData.chargingCar);
-	const batteryLevel = use$(SharedData.battery_level) ?? -1;
+	const batteryLevel = use$(SharedData.car)?.batteryLevel ?? -1;
 
 	if (!charge) {
 		return <View />;

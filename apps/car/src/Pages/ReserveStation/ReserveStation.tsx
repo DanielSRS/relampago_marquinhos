@@ -1,37 +1,36 @@
 import React, { useState } from 'react';
 import { Text, useInput } from 'ink';
-import { View } from '../../components/View/View.js';
 import type {
 	Station,
-	Request,
-	User,
 	Charge,
 	Response,
+	Car,
+	ErrorResponse,
 } from '../../../../../src/main.types.js';
 import { calculateDistance } from '../../../../../src/location.js';
-import { tcpRequest, type TCPResponse } from '../../tcp/tcp.js';
+import { View } from '../../../../shared/index.js';
 import SelectInput from 'ink-select-input';
 import { SharedData } from '../../store/shared-data.js';
-import { Logger } from '../../utils/utils.js';
-
-const carLocation = {
-	x: 10,
-	y: 10,
-};
-
-const SERVER_HOST = 'localhost'; //server IP
-const SERVER_PORT = 8080; // server port
+import { Logger } from '../../../../shared/index.js';
+import type { TCPResponse } from '../../../../shared/index.js';
+import { apiClient } from '../../../../shared/src/api/client.js';
+import type { ErrorCode } from '../../../../../src/error-codes.js';
 
 const FLEX1 = { flexBasis: 0, flexGrow: 1, flexShrink: 1 } as const;
 
 export function ReserveStation(props: {
 	station: Station;
-	user: User;
+	car: Car;
 	onGoBack: () => void;
 }) {
-	const { station, onGoBack, user } = props;
-	const [response, setResponse] = useState<TCPResponse>();
+	const { station, onGoBack, car } = props;
+	const [response, setResponse] =
+		useState<
+			TCPResponse<Response<undefined> | ErrorResponse<undefined | ErrorCode>>
+		>();
 	const isAvaliable = station.state === 'avaliable';
+	const isReserved = station.state === 'reserved'; // Verifies if the station has reserves in the queue
+	const isTheFirstInQueue = station.reservations[0] === car.id; // Verifies if the user reserve has the highest priority in the queue
 
 	useInput((input, key) => {
 		if (key.backspace) {
@@ -44,18 +43,14 @@ export function ReserveStation(props: {
 
 	const startCharging = async () => {
 		// Start loading
-		const res = await tcpRequest(
-			{
-				type: 'startCharging',
-				data: {
-					stationId: station.id,
-					userId: user.id,
-					battery_level: SharedData.battery_level.peek() ?? 50,
-				},
-			} satisfies Request,
-			SERVER_HOST,
-			SERVER_PORT,
-		);
+		const res = await apiClient({
+			type: 'startCharging',
+			data: {
+				stationId: station.id,
+				userId: car.id,
+				battery_level: SharedData.car.batteryLevel.peek() ?? 50,
+			},
+		});
 		if (res.type === 'success') {
 			const apiResponse = res.data as Response<Charge>;
 			if (apiResponse.success) {
@@ -72,24 +67,18 @@ export function ReserveStation(props: {
 
 	const reserve = async () => {
 		// Start loading
-		const res = await tcpRequest(
-			{
-				type: 'reserve',
-				data: {
-					stationId: station.id,
-					userId: user.id,
-				},
-			} satisfies Request,
-			SERVER_HOST,
-			SERVER_PORT,
-		);
+		const res = await apiClient({
+			type: 'reserve',
+			data: {
+				stationId: station.id,
+				userId: car.id,
+			},
+		});
 		if (res.type === 'success') {
-			const apiResponse = res.data as {
-				message: string;
-				success: boolean;
-			};
+			const apiResponse = res.data;
 			if (apiResponse.success) {
 				SharedData.reservedStation.set(station);
+				SharedData.reservedStation.reservations.push(car.id);
 			}
 		}
 		setResponse(res);
@@ -98,8 +87,8 @@ export function ReserveStation(props: {
 
 	return (
 		<View style={FLEX1}>
-			<View style={{ backgroundColor: 'red', padding: 1 }}>
-				<Text>{'<--'} Press v to go back</Text>
+			<View style={{ backgroundColor: 'black', padding: 1 }}>
+				<Text color={'white'}>{'<--'} Press v to go back</Text>
 			</View>
 			{/* Station info */}
 			<View
@@ -109,12 +98,16 @@ export function ReserveStation(props: {
 						// borderColor: isFocused ? 'green' : undefined,
 					}
 				}>
-				<Text>Nome: {station.id}</Text>
-				<Text>Estado: {station.state}</Text>
-				<Text>Fila: {station.reservations.length}</Text>
+				<Text>Name: {station.id}</Text>
+				<Text>State: {station.state}</Text>
+				<Text>Queue: {station.reservations.length}</Text>
+				{/* <Text>
+					Queue position:{' '}
+					{station.reservations.findIndex(id => id === car.id) + 1}
+				</Text> */}
 				<Text>
-					Distância:{' '}
-					{calculateDistance(station.location, carLocation).toFixed(2)}u
+					Distance:{' '}
+					{calculateDistance(station.location, car.location).toFixed(2)}u
 				</Text>
 				{/* <Text>Tipo: {station.type}</Text>
 						<Text>Preço: {station.price}</Text> */}
@@ -125,7 +118,7 @@ export function ReserveStation(props: {
 						label: 'Reservar',
 						value: 'reserve',
 					},
-					isAvaliable
+					isAvaliable || (isReserved && isTheFirstInQueue)
 						? {
 								label: 'Iniciar recarga',
 								value: 'charge',

@@ -14,7 +14,7 @@
     "check": "tsc",
     "lint": "eslint .",
     "runcar": "yarn workspace car build_and_run",
-    "runstation": "node --no-warnings --experimental-strip-types src/station.ts",
+    "runstation": "yarn workspace station build_and_run",
     "runserver": "node --experimental-strip-types --watch src/server.ts"
   },
   "dependencies": {

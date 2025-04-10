@@ -1,47 +1,54 @@
+import { ERROR_CODES } from '../../error-codes.ts';
 import type {
-    UserGroup,
-    ErrorResponse,
-    ChargeRecord,
-  } from '../../main.types.ts';
-  import { curry } from '../../utils.ts';
-  
-  /**
-   * Se o cliente existe
-   * Se a recarga existe
-   * Se a recarga é desse cliente
-   * Faz o pagamento
-   */
+  UserGroup,
+  ChargeRecord,
+  RequestHandler,
+} from '../../main.types.ts';
+import { curry } from '../../utils.ts';
+
+type Handler = RequestHandler<'payment'>;
+
+/**
+ * Se o cliente existe
+ * Se a recarga existe
+ * Se a recarga é desse cliente
+ * Faz o pagamento
+ */
 export const payment = curry(
   (
     users: UserGroup,
     chargeGroup: ChargeRecord,
-    data: {
-      userId: number;
-      chargeId: number;
-      hasPaid: boolean;
-    },
-  ) => {
-    const { userId, chargeId} = data;
+    data: Handler['data'],
+  ): Handler['res'] => {
+    const { userId, chargeId } = data;
 
     const user = users[userId];
     if (!user) {
       return {
         message: 'ERROR: User does not exist',
         success: false,
-        error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+        error: ERROR_CODES.USER_NOT_FOUND,
+      };
     }
 
     const recharge = Object.values(chargeGroup).find(
-    (recharge) => recharge.chargeId === chargeId && recharge.userId === userId
+      recharge => recharge.chargeId === chargeId && recharge.userId === userId,
     );
 
     if (!recharge) {
       return {
         message: 'Recharge not found or does not belong to the user.',
         success: false,
-        error: 'this field is not optional',
-      } satisfies ErrorResponse<unknown>;
+        error: 'The payment has been canceled.',
+      };
+    }
+
+    if (recharge.hasPaid) {
+      return {
+        message: 'WARNING: This recharge has already been paid.',
+        success: false,
+        error: 'It was not possible to pay this recharge receipt',
+      };
     }
 
     recharge.hasPaid = true;
@@ -49,8 +56,7 @@ export const payment = curry(
     return {
       message: 'Payment processed successfully.',
       success: true,
-      error: null,
-      updatedRecharge: recharge
+      data: recharge,
     };
-  }
+  },
 );

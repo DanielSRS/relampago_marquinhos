@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Text } from 'ink';
-import { View } from '../../components/View/View.js';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
-import { tcpRequest } from '../../tcp/tcp.js';
+import { isTcpError, View } from '../../../../shared/index.js';
 import Spinner from 'ink-spinner';
-import { FLEX1, SERVER_HOST, SERVER_PORT } from '../../constants.js';
-import type { Request, User, Response } from '../../../../../src/main.types.js';
+import { hasMouseEventEmitedRecently } from '../../../../shared/src/utils/mouse-events.js';
+import { FLEX1 } from '../../constants.js';
+import { apiClient } from '../../../../shared/src/api/client.js';
+import type { User } from '../../../../../src/main.types.js';
+
+// const log = Logger.extend('RegisterUser');
 
 export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 	const { onUserCreated } = props;
@@ -21,26 +24,27 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 		}
 		// Start loading
 		setCreatingUser(true);
-		const res = await tcpRequest(
-			{
-				type: 'registerUser',
-				data: {
-					id: id,
-				},
-			} satisfies Request,
-			SERVER_HOST,
-			SERVER_PORT,
-		);
+		const response = await apiClient({
+			type: 'registerUser',
+			data: {
+				id: id,
+			},
+		});
 		setCreatingUser(false);
 
 		// TCP connection error
-		if (res.type === 'error') {
-			settcpErrorMsg(res.error + '');
+		if (isTcpError(response)) {
+			settcpErrorMsg(response.message);
+			return;
+		}
+
+		if (!response.data.success) {
+			settcpErrorMsg(response.data.message);
 			return;
 		}
 
 		// Usuário já criado
-		onUserCreated((res.data as Response<User>).data);
+		onUserCreated(response.data.data);
 
 		// End loading
 	};
@@ -82,7 +86,13 @@ export function RegisterUser(props: { onUserCreated: (user: User) => void }) {
 					<Text>Input the user id: </Text>
 					<TextInput
 						value={idField}
-						onChange={setIdFiled}
+						onChange={value => {
+							if (hasMouseEventEmitedRecently()) {
+								// log.debug('Mouse event detected, ignoring input');
+								return;
+							}
+							setIdFiled(value);
+						}}
 						placeholder="It needs to be a number"
 						onSubmit={value => {
 							const parsed = parseInt(value);
